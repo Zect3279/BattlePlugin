@@ -6,7 +6,7 @@ authors: [ Zect ]
 
 commands:
   battle:
-    description: test command
+    description: battle helper command
     usage: |
       Use /help battle [subcommand] for more information
       /battle start - ゲーム開始
