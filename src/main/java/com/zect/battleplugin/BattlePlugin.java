@@ -1,10 +1,20 @@
 package com.zect.battleplugin;
 
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.*;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Optional;
+
+
 public final class BattlePlugin extends JavaPlugin {
+
+    private String ResTeam1;
+    private String ResTeam2;
 
     @Override
     public void onEnable() {
@@ -28,7 +38,7 @@ public final class BattlePlugin extends JavaPlugin {
         switch (args[0]) {
             case "start":
                 // output = "攻城戦を開始します";
-                GameStart(sender,cmd,args)
+                GameStart(sender,cmd,args);
                 break;
             case "check":
                 // output = "設定を表示します";
@@ -78,39 +88,45 @@ public final class BattlePlugin extends JavaPlugin {
             new TextComponent(new ComponentBuilder()
                 .append("[攻城戦支援プラグイン] ").color(ChatColor.LIGHT_PURPLE)
                 .append("設定一覧を表示予定").color(ChatColor.GREEN)
-                .append(
-                    new ComponentBuilder("[Team1リス地へTP]")
-                    .color(ChatColor.RED)
-                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                        .append("クリックでチーム1リス地へTP")
-                        .create()
-                    ))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + ResTeam1))
+                .create())
+        ).create();
+        BaseComponent[] TP1 = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                        .append("[Team1リス地へTP] ").color(ChatColor.GOLD)
+                        .create())
+        )
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                    .append("クリックでチーム1リス地へTP")
                     .create()
-                )
-                .append(
-                    new ComponentBuilder("[Team2リス地へTP]")
-                    .color(ChatColor.BLUE)
-                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                        .append("クリックでチーム2リス地へTP")
-                        .create()
-                    ))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + ResTeam2))
+                ))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + ResTeam1))
+                .create();
+        BaseComponent[] TP2 = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                        .append("[Team2リス地へTP] ").color(ChatColor.GOLD)
+                        .create())
+        )
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                    .append("クリックでチーム2リス地へTP")
                     .create()
-                )
-                .append(
-                    new ComponentBuilder("[クリックで対戦を開始]")
-                    .color(ChatColor.GOLD)
-                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                        .append("クリックで攻城戦を開始")
-                        .create()
-                    ))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/battle start"))
+                ))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + ResTeam2))
+                .create();
+        BaseComponent[] starting = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                        .append("[クリックで対戦を開始] ").color(ChatColor.GOLD)
+                        .create())
+        )
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                    .append("クリックで攻城戦を開始")
                     .create()
-                ).create()
-             )
-        );
+                ))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/battle start"))
+                .create();
         sender.sendMessage(check);
+        sender.sendMessage(TP1);
+        sender.sendMessage(TP2);
+        sender.sendMessage(starting);
     }
     
 }
