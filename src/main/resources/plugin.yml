@@ -16,24 +16,3 @@ commands:
       /battle SetBorder - 範囲を指定
       /battle SetSpawn [チーム名] - 指定チームのスポーン地点を設定
       /battle SetTimeLimit [秒数] - 制限時間を設定
-  battle start:
-    description: ゲームを開始
-    usage: /battle start
-  battle check:
-    description: 現在の設定を表示
-    usage: /battle check
-  battle SetFightTeam:
-    description: 参加チーム登録
-    usage: /battle SetFightTeam [team]
-  battle SetWatchTeam:
-    description: 観覧チーム登録
-    usage: /battle SetWatchTeam [team]
-  battle SetBorder:
-    description: 現在の位置を戦闘範囲の角に指定
-    usage: /battle SetBorder
-  battle SetSpawn:
-    description: 指定チームのスポーン地点設定
-    usage: /battle SetSpawn [team]
-  battle SetTimeLimit:
-    description: 設定秒数指定
-    usage: /battle SetTimeLimit [second]
