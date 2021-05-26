@@ -17,6 +17,33 @@ public final class BattlePlugin extends JavaPlugin {
     private String ResTeam2;
 
     @Override
+    public void onLoad() {
+        // プラグインが動いたときに実行
+        new CommandAPICommand("perm")
+        .withSubcommand(new CommandAPICommand("battle")
+            .withArguments(new StringArgument("start"))
+            .withArguments(new StringArgument("check"))
+            .withSubcommand(new CommandAPICommand("SetFightTeam")
+                .withArguments(new TeamArgument("team"))
+            )
+            .withSubcommand(new CommandAPICommand("SetWatcherTeam")
+                .withArguments(new TeamArgument("team"))
+            )
+            .withSubcommand(new CommandAPICommand("SetSpawn")
+                .withSubcommand(new TeamArgument("team"))
+                    .withArguments(new LocationArgument("location"))
+            )
+            .withSubcommand(new CommandAPICommand("SetCorner")
+                .withArguments(new LocationArgument("location"))
+            )
+            .withSubcommand(new CommandAPICommand("SetTimeLimit")
+                .withArguments() // int型
+            )
+        )
+        .register();
+    }
+    
+    @Override
     public void onEnable() {
         // Plugin startup logic
 
