@@ -19,26 +19,54 @@ public final class BattlePlugin extends JavaPlugin {
     @Override
     public void onLoad() {
         // プラグインが動いたときに実行
-        new CommandAPICommand("perm")
-        .withSubcommand(new CommandAPICommand("battle")
-            .withArguments(new StringArgument("start"))
-            .withArguments(new StringArgument("check"))
-            .withSubcommand(new CommandAPICommand("SetFightTeam")
+        new CommandAPICommand("battle")
+        .withArguments(new StringArgument("start"))
+        .executes((sender, args) -> {
+            GameStart(sender,args);
+        })
+        .withArguments(new StringArgument("check"))
+        .withSubcommand(new CommandAPICommand("FightTeam")
+            .withSubCommand(new CommandAPICommand("add"))
                 .withArguments(new TeamArgument("team"))
-            )
-            .withSubcommand(new CommandAPICommand("SetWatcherTeam")
+                .executes((sender, args) -> {
+                    AddFighters(sender,args);
+                })
+            .withSubCommand(new CommandAPICommand("remove"))
                 .withArguments(new TeamArgument("team"))
-            )
-            .withSubcommand(new CommandAPICommand("SetSpawn")
-                .withSubcommand(new TeamArgument("team"))
-                    .withArguments(new LocationArgument("location"))
-            )
-            .withSubcommand(new CommandAPICommand("SetCorner")
+                .executes((sender, args) -> {
+                    RemoveFighters(sender,args);
+                })
+        )
+        .withSubcommand(new CommandAPICommand("WatcherTeam")
+            .withSubCommand(new CommandAPICommand("add"))
+                .withArguments(new TeamArgument("team"))
+                .executes((sender, args) -> {
+                    AddWatcher(sender,args);
+                })
+            .withSubCommand(new CommandAPICommand("remove"))
+                .withArguments(new TeamArgument("team"))
+                .executes((sender, args) -> {
+                    RemoveWatcher(sender,args);
+                })
+        )
+        .withSubcommand(new CommandAPICommand("SetSpawn")
+            .withSubcommand(new TeamArgument("team"))
                 .withArguments(new LocationArgument("location"))
-            )
-            .withSubcommand(new CommandAPICommand("SetTimeLimit")
-                .withArguments() // int型
-            )
+                .executes((sender, args) -> {
+                    // 場所を保存してあげる
+                })
+        )
+        .withSubcommand(new CommandAPICommand("SetCorner")
+            .withArguments(new LocationArgument("location"))
+                .executes((sender, args) -> {
+                    // 場所を保存してあげる
+                })
+        )
+        .withSubcommand(new CommandAPICommand("SetTimeLimit")
+            .withArguments(new IntegerArgument("second"))
+                .executes((sender, args) -> {
+                    // 時間を保存してあげる
+                })
         )
         .register();
     }
@@ -54,59 +82,27 @@ public final class BattlePlugin extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    // onCommand は plugin.yml に記載されたコマンドが呼ばれた時に実行
-    @Override
-    public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        // argsが無かったら、切り返す
-        if (args.length == 0) {
-            return false;
-        }
-        String output;
-        switch (args[0]) {
-            case "start":
-                // output = "攻城戦を開始します";
-                GameStart(sender,cmd,args);
-                break;
-            case "check":
-                // output = "設定を表示します";
-                CheckSettings(sender,cmd,args);
-                break;
-            case "setfightteam":
-                // output = "参加チームに追加";
-                AddFighters(sender,cmd,args);
-                break;
-            case "setwatchteam":
-                // output = "観覧チームに追加";
-                SetWatcher(sender,cmd,args);
-                break;
-            case "setspawn":
-                output = "スポーン地点設定";
-                break;
-            case "setborder":
-                output = "範囲指定";
-                break;
-            case "settimelimit":
-                output = "制限自邸を設定";
-                break;
-            default:
-                return false;
-        }
-        // sender.sendMessage(output);
-        return true;
-    }
-    public void GameStart(CommandSender sender, Command cms, String[] args) {
+    public void GameStart(CommandSender sender, String[] args) {
         // ゲーム開始
         GameController.start();
     }
-    public void AddFighters(CommandSender sender, Command cmd, String[] args) {
+    public void AddFighters(CommandSender sender, String[] args) {
         // 戦闘チーム追加
-        // 既に２つあったら、古いやつを消す
+        // 既に２つあったら、エラー吐かせる
     }
-    public void SetWatcher(CommandSender sender, Command cmd, String[] args) {
-        // 観覧チームを指定
-        // 一つのみ指定可能
+    public void RemoveFighters(CommandSender sender, String[] args) {
+        // 戦闘チーム撤去
+        // 0個だったら、エラー吐かせる
     }
-    public void CheckSettings(CommandSender sender, Command cmd, String[] args) {
+    public void AddWatcher(CommandSender sender, String[] args) {
+        // 観覧チームを追加
+        // 既にあったら、エラー吐く
+    }
+    public void RemoveWatcher(CommandSender sender, String[] args) {
+        // 観覧チームを削除
+        // 0個だったら、エラー吐く
+    }
+    public void CheckSettings(CommandSender sender, String[] args) {
         // 設定一覧を表示
         // チーム1のリス地へTP
         // チーム2のリス地へTP
@@ -123,7 +119,7 @@ public final class BattlePlugin extends JavaPlugin {
                         .create())
         )
                 .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                    .append("クリックでチーム1リス地へTP")
+                    .append("クリックでチーム1のリス地へTP")
                     .create()
                 ))
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + ResTeam1))
