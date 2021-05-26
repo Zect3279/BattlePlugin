@@ -13,9 +13,6 @@ import java.util.Optional;
 
 public final class BattlePlugin extends JavaPlugin {
 
-    private Location ResTeam1;
-    private Location ResTeam2;
-
     @Override
     public void onLoad() {
         // プラグインが動いたときに実行
@@ -83,7 +80,6 @@ public final class BattlePlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-
     }
 
     @Override
@@ -91,11 +87,26 @@ public final class BattlePlugin extends JavaPlugin {
         // Plugin shutdown logic
     }
     
-    public void CheckCanPlay() {
+    private Location ResTeam1;
+    private Location ResTeam2;
+    
+    public String CheckCanPlay() {
         // ゲーム開始可能か確認する
+        // 開始できなかったら、reasonを返す
+        
+        // ゲームが開始できるなら、nullを返す
     }
     
     public void GameStart(CommandSender sender, String[] args) {
+        // ゲーム開始できるか判定する
+        String checking = CheckCanPlay();
+        if (checking) {
+            // ゲームが開始できない
+            // 設定一覧を表示
+            BaseComponent[] check = SettingList();
+            sender.sendMessage("[攻城戦支援プラグイン]\n" + checking + "\nが設定できていません\n" + check);
+            
+        }
         // ゲーム開始
         GameController.start();
     }
@@ -115,21 +126,25 @@ public final class BattlePlugin extends JavaPlugin {
         // 観覧チームを削除
         // 0個だったら、エラー吐く
     }
+    public BaseComponent[] SettingList() {
+        BaseComponent[] settings = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                    .append("[攻城戦支援プラグイン]\n").color(ChatColor.LIGHT_PURPLE)
+                    .append("設定一覧を表示予定").color(ChatColor.GREEN)
+                    .create())
+            ).create();
+        return settings;
+    }
     public void CheckSettings(CommandSender sender, String[] args) {
         // 設定一覧を表示
         // チーム1のリス地へTP
         // チーム2のリス地へTP
         // ゲームスタートボタン
-        BaseComponent[] check = new ComponentBuilder(
-            new TextComponent(new ComponentBuilder()
-                .append("[攻城戦支援プラグイン] ").color(ChatColor.LIGHT_PURPLE)
-                .append("設定一覧を表示予定").color(ChatColor.GREEN)
-                .create())
-        ).create();
+        BaseComponent[] check = SettingList();
         if (ResTeam1 != null) {
             BaseComponent[] TP1 = new ComponentBuilder(
                 new TextComponent(new ComponentBuilder()
-                        .append("[Team1リス地へTP] ").color(ChatColor.GOLD)
+                        .append("[Team1リス地へTP]").color(ChatColor.GOLD)
                         .create())
             )
                 .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
@@ -142,7 +157,7 @@ public final class BattlePlugin extends JavaPlugin {
         if (ResTeam2 != null) {
             BaseComponent[] TP2 = new ComponentBuilder(
                     new TextComponent(new ComponentBuilder()
-                            .append("[Team2リス地へTP] ").color(ChatColor.GOLD)
+                            .append("[Team2リス地へTP]").color(ChatColor.GOLD)
                             .create())
             )
                     .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
@@ -152,10 +167,11 @@ public final class BattlePlugin extends JavaPlugin {
                     .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + ResTeam2))
                     .create();
         }
-        if (CheckCanPlay == true) {
+        String checking = CheckCanPlay();
+        if (checking == null) {
             BaseComponent[] starting = new ComponentBuilder(
                     new TextComponent(new ComponentBuilder()
-                            .append("[クリックで対戦を開始] ").color(ChatColor.GOLD)
+                            .append("[クリックで対戦を開始]").color(ChatColor.GOLD)
                             .create())
             )
                     .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
@@ -166,15 +182,12 @@ public final class BattlePlugin extends JavaPlugin {
                     .create();
         }
         
-        sender.sendMessage(check);
-        if (TP1 != null) {
-            sender.sendMessage(TP1);
-        }
-        if (TP2 != null) {
-            sender.sendMessage(TP2);
-        }
-        if (starting != null) {
-            sender.sendMessage(starting);
+        if (TP1 && TP2 && starting) {
+            sender.sendMessage(check + "\n" + TP1 + "\n" + TP2 + "\n" + starting);
+        }else if (TP1) {
+            sender.sendMessage(check + "\n" + TP1);
+        }else if (TP2) {
+            sender.sendMessage(check + "\n" + TP2);
         }
     }
     
