@@ -1,8 +1,14 @@
 package com.zect.battleplugin;
 
+import dev.jorel.commandapi.*;
+import dev.jorel.commandapi.arguments.IntegerArgument;
+import dev.jorel.commandapi.arguments.LocationArgument;
+import dev.jorel.commandapi.arguments.StringArgument;
+import dev.jorel.commandapi.arguments.TeamArgument;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,71 +21,70 @@ public final class BattlePlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        // プラグインが動いたときに実行
+        CommandAPI.onLoad(true);
+
         new CommandAPICommand("battle")
-        .withArguments(new StringArgument("start"))
-        .executes((sender, args) -> {
-            // `/battle start`を実行したらゲームを開始する
-            GameStart(sender,args);
-        })
-        .withArguments(new StringArgument("check"))
-        .executes((sender, args) -> {
-            // `/battle check`を実行したら設定一覧を表示する
-            CheckSettings(sender, args);
-        })
-        .withSubcommand(new CommandAPICommand("FightTeam")
-            .withSubCommand(new CommandAPICommand("add"))
-                .withArguments(new TeamArgument("team"))
+                .withArguments(new StringArgument("start"))
                 .executes((sender, args) -> {
-                    // `/battle FightTeam add [team]`を実行したら参加チームに追加する
-                    AddFighters(sender,args);
+                    // `/battle start`を実行したらゲームを開始する
+                    sender.sendMessage("開始");
+//                    GameStart(sender, args);
                 })
-            .withSubCommand(new CommandAPICommand("remove"))
-                .withArguments(new TeamArgument("team"))
+                .withArguments(new StringArgument("check"))
                 .executes((sender, args) -> {
-                    // `/battle remove [team]`を実行したら参加チームから削除する
-                    RemoveFighters(sender,args);
+                    // `/battle check`を実行したら設定一覧を表示する
+                    sender.sendMessage("設定確認");
+//                    CheckSettings(sender, args);
                 })
-        )
-        .withSubcommand(new CommandAPICommand("WatcherTeam")
-            .withSubCommand(new CommandAPICommand("add"))
-                .withArguments(new TeamArgument("team"))
-                .executes((sender, args) -> {
-                    // `/battle WatcherTeam add [team]`を実行したら観覧チームに追加する
-                    AddWatcher(sender,args);
-                })
-            .withSubCommand(new CommandAPICommand("remove"))
-                .withArguments(new TeamArgument("team"))
-                .executes((sender, args) -> {
-                    // `/battle WatcherTeam remove [team]`を実行したら観覧チームから削除する
-                    RemoveWatcher(sender,args);
-                })
-        )
-        .withSubcommand(new CommandAPICommand("SetSpawn")
-            .withSubcommand(new TeamArgument("team"))
-                .withArguments(new LocationArgument("location"))
-                .executes((sender, args) -> {
-                    // 場所を保存してあげる
-                })
-        )
-        .withSubcommand(new CommandAPICommand("SetCorner")
-            .withArguments(new LocationArgument("location"))
-                .executes((sender, args) -> {
-                    // 場所を保存してあげる
-                })
-        )
-        .withSubcommand(new CommandAPICommand("SetTimeLimit")
-            .withArguments(new IntegerArgument("second"))
-                .executes((sender, args) -> {
-                    // 時間を保存してあげる
-                })
-        )
-        .register();
+                .withSubcommand(new CommandAPICommand("FightTeam")
+                        .withSubcommand(new CommandAPICommand("add")
+                                .withArguments(new TeamArgument("team"))
+                                .executes((sender, args) -> {
+                                    // `/battle FightTeam add [team]`を実行したら参加チームに追加する
+//                                    AddFighters(sender,args);
+                                })
+                        )
+                        .withSubcommand(new CommandAPICommand("remove")
+                                .withArguments(new TeamArgument("team"))
+                                .executes((sender, args) -> {
+                                    // `/battle FightTeam add [team]`を実行したら参加チームに追加する
+//                                    AddFighters(sender,args);
+                                })
+                        )
+                )
+                .withSubcommand(new CommandAPICommand("WatcherTeam")
+                        .withSubcommand(new CommandAPICommand("add")
+                                .withArguments(new TeamArgument("team"))
+                                .executes((sender, args) -> {
+                                    // 場所を保存してあげる
+                                })
+                        )
+                        .withSubcommand(new CommandAPICommand("remove")
+                                .withArguments(new TeamArgument("team"))
+                                .executes((sender, args) -> {
+                                    // 場所を保存してあげる
+                                })
+                        )
+                )
+                .withSubcommand(new CommandAPICommand("SetCorner")
+                        .withArguments(new LocationArgument("location"))
+                        .executes((sender, args) -> {
+                            // 場所を保存してあげる
+                        })
+                )
+                .withSubcommand(new CommandAPICommand("SetTimeLimit")
+                        .withArguments(new IntegerArgument("second"))
+                        .executes((sender, args) -> {
+                            // 時間を保存してあげる
+                        })
+                )
+                .register();
     }
     
     @Override
     public void onEnable() {
         // Plugin startup logic
+        CommandAPI.onEnable(this);
     }
 
     @Override
@@ -90,22 +95,23 @@ public final class BattlePlugin extends JavaPlugin {
     private Location ResTeam1;
     private Location ResTeam2;
     
-    public String CheckCanPlay() {
-        // ゲーム開始可能か確認する
-        // 開始できなかったら、reasonを返す
-        
-        // ゲームが開始できるなら、nullを返す
-    }
+//    public String CheckCanPlay() {
+//        // ゲーム開始可能か確認する
+//        // 開始できなかったら、reasonを返す
+//
+//        // ゲームが開始できるなら、nullを返す
+//    }
     
-    public void GameStart(CommandSender sender, String[] args) {
+    public void GameStart(CommandSender sender, Object[] args) {
         // ゲーム開始できるか判定する
-        String checking = CheckCanPlay();
-        if (checking) {
+        String checking = "ああ";
+//        String checking = CheckCanPlay();
+        if (checking != null) {
             // ゲームが開始できない
             // 設定一覧を表示
             BaseComponent[] check = SettingList();
             sender.sendMessage("[攻城戦支援プラグイン]\n" + checking + "\nが設定できていません\n" + check);
-            
+
         }
         // ゲーム開始
         GameController.start();
@@ -135,13 +141,14 @@ public final class BattlePlugin extends JavaPlugin {
             ).create();
         return settings;
     }
-    public void CheckSettings(CommandSender sender, String[] args) {
+    public void CheckSettings(CommandSender sender, Object[] args) {
         // 設定一覧を表示
         // チーム1のリス地へTP
         // チーム2のリス地へTP
         // ゲームスタートボタン
         BaseComponent[] check = SettingList();
-        if (ResTeam1 != null) {
+        if (ResTeam1 == null) {
+//        if (ResTeam1 != null) {
             BaseComponent[] TP1 = new ComponentBuilder(
                 new TextComponent(new ComponentBuilder()
                         .append("[Team1リス地へTP]").color(ChatColor.GOLD)
@@ -154,7 +161,8 @@ public final class BattlePlugin extends JavaPlugin {
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + ResTeam1))
                 .create();
         }
-        if (ResTeam2 != null) {
+        if (ResTeam2 == null) {
+//        if (ResTeam2 != null) {
             BaseComponent[] TP2 = new ComponentBuilder(
                     new TextComponent(new ComponentBuilder()
                             .append("[Team2リス地へTP]").color(ChatColor.GOLD)
@@ -167,7 +175,8 @@ public final class BattlePlugin extends JavaPlugin {
                     .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + ResTeam2))
                     .create();
         }
-        String checking = CheckCanPlay();
+        String checking = "ああ";
+//        String checking = CheckCanPlay();
         if (checking == null) {
             BaseComponent[] starting = new ComponentBuilder(
                     new TextComponent(new ComponentBuilder()
@@ -182,13 +191,13 @@ public final class BattlePlugin extends JavaPlugin {
                     .create();
         }
         
-        if (TP1 && TP2 && starting) {
-            sender.sendMessage(check + "\n" + TP1 + "\n" + TP2 + "\n" + starting);
-        }else if (TP1) {
-            sender.sendMessage(check + "\n" + TP1);
-        }else if (TP2) {
-            sender.sendMessage(check + "\n" + TP2);
-        }
+//        if (TP1 != null && TP2 != null && starting != null) {
+//            sender.sendMessage(check + "\n" + TP1 + "\n" + TP2 + "\n" + starting);
+//        }else if (TP1) {
+//            sender.sendMessage(check + "\n" + TP1);
+//        }else if (TP2) {
+//            sender.sendMessage(check + "\n" + TP2);
+//        }
     }
     
 }
