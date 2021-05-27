@@ -11,6 +11,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -19,17 +21,7 @@ public final class BattlePlugin extends JavaPlugin {
     @Override
     public void onLoad() {
         CommandAPI.onLoad(true);
-        
-        // 選択肢を作成
-        String[] ExtBool = new String[] {"add", "remove"};
 
-        // サジェストを登録
-        List<Argument> Fighting = new ArrayList<>();
-        Fighting.add(new StringArgument("FightTeam").overrideSuggestions(ExtBool));
-        
-        List<Argument> Watching = new ArrayList<>();
-        Watching.add(new StringArgument("WatchTeam").overrideSuggestions(ExtBool));
-        
         new CommandAPICommand("battle")
                 .withArguments(new StringArgument("start"))
                 .executes((sender, args) -> {
@@ -43,19 +35,35 @@ public final class BattlePlugin extends JavaPlugin {
                     sender.sendMessage("設定確認");
 //                    CheckSettings(sender, args);
                 })
-                .withSubcommand(Fighting)
-                        .withArguments(new TeamArgument("team"))
-                        .executes((sender, args) -> {
-                            // `/battle FightTeam add [team]`を実行したら参加チームに追加する
+                .withSubcommand(new CommandAPICommand("FightTeam")
+                                .withSubcommand(new CommandAPICommand("add")
+                                                .withArguments(new TeamArgument("team"))
+                                                .executes((sender, args) -> {
+                                                    // `/battle FightTeam add [team]`を実行したら参加チームに追加する
 //                                    AddFighters(sender,args);
-                        })
+                                                })
+                                )
+                                .withSubcommand(new CommandAPICommand("remove")
+                                                .withArguments(new TeamArgument("team"))
+                                                .executes((sender, args) -> {
+                                                    // `/battle FightTeam add [team]`を実行したら参加チームに追加する
+//                                    AddFighters(sender,args);
+                                                })
+                                )
                 )
-                .withSubcommand(Watching)
-                        .withArguments(new TeamArgument("team"))
-                        .executes((sender, args) -> {
-                            // `/battle FightTeam add [team]`を実行したら参加チームに追加する
-//                                    AddFighters(sender,args);
-                        })
+                .withSubcommand(new CommandAPICommand("WatcherTeam")
+                        .withSubcommand(new CommandAPICommand("add")
+                                .withArguments(new TeamArgument("team"))
+                                .executes((sender, args) -> {
+                                    // 場所を保存してあげる
+                                })
+                        )
+                        .withSubcommand(new CommandAPICommand("remove")
+                                .withArguments(new TeamArgument("team"))
+                                .executes((sender, args) -> {
+                                    // 場所を保存してあげる
+                                })
+                        )
                 )
                 .withSubcommand(new CommandAPICommand("SetCorner")
                         .withArguments(new LocationArgument("location"))
@@ -71,7 +79,7 @@ public final class BattlePlugin extends JavaPlugin {
                 )
                 .register();
     }
-    
+
     @Override
     public void onEnable() {
         // Plugin startup logic
