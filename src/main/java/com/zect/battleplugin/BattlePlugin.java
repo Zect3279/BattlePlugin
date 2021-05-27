@@ -43,23 +43,19 @@ public final class BattlePlugin extends JavaPlugin {
                     sender.sendMessage("設定確認");
 //                    CheckSettings(sender, args);
                 })
-                .withSubcommand(new CommandAPICommand("FightTeam")
-                        .withSubcommand(Fighting)
-                                .withArguments(new TeamArgument("team"))
-                                .executes((sender, args) -> {
-                                    // `/battle FightTeam add [team]`を実行したら参加チームに追加する
+                .withSubcommand(Fighting)
+                        .withArguments(new TeamArgument("team"))
+                        .executes((sender, args) -> {
+                            // `/battle FightTeam add [team]`を実行したら参加チームに追加する
 //                                    AddFighters(sender,args);
-                                })
-                        )
+                        })
                 )
-                .withSubcommand(new CommandAPICommand("WatchTeam")
-                        .withSubcommand(Watching)
-                                .withArguments(new TeamArgument("team"))
-                                .executes((sender, args) -> {
-                                    // `/battle FightTeam add [team]`を実行したら参加チームに追加する
+                .withSubcommand(Watching)
+                        .withArguments(new TeamArgument("team"))
+                        .executes((sender, args) -> {
+                            // `/battle FightTeam add [team]`を実行したら参加チームに追加する
 //                                    AddFighters(sender,args);
-                                })
-                        )
+                        })
                 )
                 .withSubcommand(new CommandAPICommand("SetCorner")
                         .withArguments(new LocationArgument("location"))
