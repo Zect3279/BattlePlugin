@@ -7,13 +7,13 @@
     - アドベンチャーで暗くして、tpしまくる？
 
 ## usage
-- /battle start -> 開始
-- /battle check -> 現在の設定を表示
-- /battle SetFightTeam <チーム名> -> 参加チームに登録
-- /battle SetWatchTeam <チーム名> -> 観覧チームに登録
-- /battle SetBorder -> 範囲を指定
-- /battle SetSpawn <チーム名> -> 指定チームのスポーン地点を設定
-- /battle SetLimit <秒数> -> 制限時間を設定
+- /siege start -> 開始
+- /siege check -> 現在の設定を表示
+- /siege SetFightTeam <チーム名> -> 参加チームに登録
+- /siege SetWatchTeam <チーム名> -> 観覧チームに登録
+- /siege SetBorder -> 範囲を指定
+- /siege SetSpawn <チーム名> -> 指定チームのスポーン地点を設定
+- /siege SetLimit <秒数> -> 制限時間を設定
 
 ## 詳細設定
 #### デフォルト
@@ -52,13 +52,13 @@
 - 指定場所が空気の場合のみ受け付ける
 - 登録されているチーム名のみ受け付ける
 
-#### SetBorder
+#### SetBCorner
 - 遊ぶ範囲を指定
 - ２つ指定する
 - 外周ラインに触れたら、一つ前にいた座標にTPする
     - 出れないし、入れない
 - ２つ無いと開始できないようにする
 
-#### SetLimit
+#### SetTimeLimit
 - 制限時間を設定
 - 秒数で指定する
