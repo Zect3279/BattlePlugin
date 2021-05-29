@@ -26,65 +26,70 @@ public final class BattlePlugin extends JavaPlugin {
 
         String[] subCommandList = new String[] {"start", "check", "FightTeam", "WatcherTeam", "SetCorner", "SetTimeLimit"};
 
-        CommandAPICommand start = new CommandAPICommand("start")
-                .executes((sender, args) -> {
-                    //perm group remove code
-                    sender.sendMessage("開始");
-                    GameStart(sender, args);
-                });
-
-        CommandAPICommand check = new CommandAPICommand("check")
-                .executes((sender, args) -> {
-                    //perm group remove code
-                    sender.sendMessage("設定確認");
-                    CheckSettings(sender, args);
-                });
-
-        CommandAPICommand teamAdd = new CommandAPICommand("add")
-                .withArguments(new StringArgument("groupName"))
-                .executes((sender, args) -> {
-                    //perm group add code
-//                    case args[2]
-                    sender.sendMessage("チームを追加");
-                    AddFighters(sender,args);
-                });
-
-        CommandAPICommand teamRemove = new CommandAPICommand("remove")
-                .withArguments(new StringArgument("groupName"))
-                .executes((sender, args) -> {
-                    //perm group remove code
-                    sender.sendMessage("チームを削除");
-                });
-
-        CommandAPICommand fight = new CommandAPICommand("FightTeam")
-                .withSubcommand(teamAdd)
-                .withSubcommand(teamRemove);
-
-        CommandAPICommand watch = new CommandAPICommand("WatchTeam")
-                .withSubcommand(teamAdd)
-                .withSubcommand(teamRemove);
-
-        CommandAPICommand corner = new CommandAPICommand("SetCorner")
-                .withArguments(new LocationArgument("location"))
-                .executes((sender, args) -> {
-                    //perm group remove code
-                    sender.sendMessage("座標を登録");
-                });
-
-        CommandAPICommand limit = new CommandAPICommand("SetTimeLimit")
-                .withArguments(new IntegerArgument("second"))
-                .executes((sender, args) -> {
-                    //perm group remove code
-                    sender.sendMessage("時間制限を追加");
-                });
-
         new CommandAPICommand("siege")
-                .withSubcommand(start)
-                .withSubcommand(check)
-                .withSubcommand(fight)
-                .withSubcommand(watch)
-                .withSubcommand(corner)
-                .withSubcommand(limit)
+                .withSubcommand(new CommandAPICommand("start")
+                        .executes((sender, args) -> {
+                            //perm group remove code
+                            sender.sendMessage("開始");
+                            GameStart(sender, args);
+                        })
+                )
+                .withSubcommand(new CommandAPICommand("check")
+                        .executes((sender, args) -> {
+                            //perm group remove code
+                            sender.sendMessage("設定確認");
+                            CheckSettings(sender, args);
+                        })
+                )
+                .withSubcommand(new CommandAPICommand("FightTeam")
+                        .withSubcommand(new CommandAPICommand("add")
+                                .withArguments(new StringArgument("groupName"))
+                                .executes((sender, args) -> {
+                                    //perm group add code
+                                    sender.sendMessage("戦闘チームを追加");
+                                    AddFighters(sender,args);
+                                })
+                        )
+                        .withSubcommand(new CommandAPICommand("remove")
+                                .withArguments(new StringArgument("groupName"))
+                                .executes((sender, args) -> {
+                                    //perm group remove code
+                                    sender.sendMessage("戦闘チームを削除");
+                                })
+                        )
+                )
+                .withSubcommand(new CommandAPICommand("WatchTeam")
+                        .withSubcommand(new CommandAPICommand("add")
+                                .withArguments(new StringArgument("groupName"))
+                                .executes((sender, args) -> {
+                                    //perm group add code
+//                    case args[2]
+                                    sender.sendMessage("観覧チームを追加");
+                                    AddFighters(sender,args);
+                                })
+                        )
+                        .withSubcommand(new CommandAPICommand("remove")
+                                .withArguments(new StringArgument("groupName"))
+                                .executes((sender, args) -> {
+                                    //perm group remove code
+                                    sender.sendMessage("観覧チームを削除");
+                                })
+                        )
+                )
+                .withSubcommand(new CommandAPICommand("SetCorner")
+                        .withArguments(new LocationArgument("location"))
+                        .executes((sender, args) -> {
+                            //perm group remove code
+                            sender.sendMessage("座標を登録");
+                        })
+                )
+                .withSubcommand(new CommandAPICommand("SetTimeLimit")
+                        .withArguments(new IntegerArgument("second"))
+                        .executes((sender, args) -> {
+                            //perm group remove code
+                            sender.sendMessage("時間制限を追加");
+                        })
+                )
                 .register();
     }
 
