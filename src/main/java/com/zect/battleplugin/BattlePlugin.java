@@ -1,7 +1,5 @@
 package com.zect.battleplugin;
 
-import static org.icecream.IceCream.ic;
-
 import dev.jorel.commandapi.*;
 import dev.jorel.commandapi.arguments.*;
 import net.md_5.bungee.api.ChatColor;
@@ -10,10 +8,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,61 +24,67 @@ public final class BattlePlugin extends JavaPlugin {
     public void onLoad() {
         CommandAPI.onLoad(true);
 
-        new CommandAPICommand("battle")
-                .withArguments(new StringArgument("start"))
+        String[] subCommandList = new String[] {"start", "check", "FightTeam", "WatcherTeam", "SetCorner", "SetTimeLimit"};
+
+        CommandAPICommand start = new CommandAPICommand("start")
                 .executes((sender, args) -> {
-                    // `/battle start`を実行したらゲームを開始する
+                    //perm group remove code
                     sender.sendMessage("開始");
-//                    GameStart(sender, args);
-                })
-                .withArguments(new StringArgument("check"))
+                    GameStart(sender, args);
+                });
+
+        CommandAPICommand check = new CommandAPICommand("check")
                 .executes((sender, args) -> {
-                    // `/battle check`を実行したら設定一覧を表示する
+                    //perm group remove code
                     sender.sendMessage("設定確認");
-//                    CheckSettings(sender, args);
-                })
-                .withSubcommand(new CommandAPICommand("FightTeam")
-                                .withSubcommand(new CommandAPICommand("add")
-                                                .withArguments(new TeamArgument("team"))
-                                                .executes((sender, args) -> {
-                                                    // `/battle FightTeam add [team]`を実行したら参加チームに追加する
-//                                    AddFighters(sender,args);
-                                                })
-                                )
-                                .withSubcommand(new CommandAPICommand("remove")
-                                                .withArguments(new TeamArgument("team"))
-                                                .executes((sender, args) -> {
-                                                    // `/battle FightTeam add [team]`を実行したら参加チームに追加する
-//                                    AddFighters(sender,args);
-                                                })
-                                )
-                )
-                .withSubcommand(new CommandAPICommand("WatcherTeam")
-                        .withSubcommand(new CommandAPICommand("add")
-                                .withArguments(new TeamArgument("team"))
-                                .executes((sender, args) -> {
-                                    // 場所を保存してあげる
-                                })
-                        )
-                        .withSubcommand(new CommandAPICommand("remove")
-                                .withArguments(new TeamArgument("team"))
-                                .executes((sender, args) -> {
-                                    // 場所を保存してあげる
-                                })
-                        )
-                )
-                .withSubcommand(new CommandAPICommand("SetCorner")
-                        .withArguments(new LocationArgument("location"))
-                        .executes((sender, args) -> {
-                            // 場所を保存してあげる
-                        })
-                )
-                .withSubcommand(new CommandAPICommand("SetTimeLimit")
-                        .withArguments(new IntegerArgument("second"))
-                        .executes((sender, args) -> {
-                            // 時間を保存してあげる
-                        })
-                )
+                    CheckSettings(sender, args);
+                });
+
+        CommandAPICommand teamAdd = new CommandAPICommand("add")
+                .withArguments(new StringArgument("groupName"))
+                .executes((sender, args) -> {
+                    //perm group add code
+//                    case args[2]
+                    sender.sendMessage("チームを追加");
+                    AddFighters(sender,args);
+                });
+
+        CommandAPICommand teamRemove = new CommandAPICommand("remove")
+                .withArguments(new StringArgument("groupName"))
+                .executes((sender, args) -> {
+                    //perm group remove code
+                    sender.sendMessage("チームを削除");
+                });
+
+        CommandAPICommand fight = new CommandAPICommand("FightTeam")
+                .withSubcommand(teamAdd)
+                .withSubcommand(teamRemove);
+
+        CommandAPICommand watch = new CommandAPICommand("WatchTeam")
+                .withSubcommand(teamAdd)
+                .withSubcommand(teamRemove);
+
+        CommandAPICommand corner = new CommandAPICommand("SetCorner")
+                .withArguments(new LocationArgument("location"))
+                .executes((sender, args) -> {
+                    //perm group remove code
+                    sender.sendMessage("座標を登録");
+                });
+
+        CommandAPICommand limit = new CommandAPICommand("SetTimeLimit")
+                .withArguments(new IntegerArgument("second"))
+                .executes((sender, args) -> {
+                    //perm group remove code
+                    sender.sendMessage("時間制限を追加");
+                });
+
+        new CommandAPICommand("siege")
+                .withSubcommand(start)
+                .withSubcommand(check)
+                .withSubcommand(fight)
+                .withSubcommand(watch)
+                .withSubcommand(corner)
+                .withSubcommand(limit)
                 .register();
     }
 
@@ -92,17 +98,17 @@ public final class BattlePlugin extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
     }
-    
+
     private Location ResTeam1;
     private Location ResTeam2;
-    
+
 //    public String CheckCanPlay() {
 //        // ゲーム開始可能か確認する
 //        // 開始できなかったら、reasonを返す
 //
 //        // ゲームが開始できるなら、nullを返す
 //    }
-    
+
     public void GameStart(CommandSender sender, Object[] args) {
         // ゲーム開始できるか判定する
         String checking = "ああ";
@@ -117,19 +123,19 @@ public final class BattlePlugin extends JavaPlugin {
         // ゲーム開始
         GameController.start();
     }
-    public void AddFighters(CommandSender sender, String[] args) {
+    public void AddFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム追加
         // 既に２つあったら、エラー吐かせる
     }
-    public void RemoveFighters(CommandSender sender, String[] args) {
+    public void RemoveFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム撤去
         // 0個だったら、エラー吐かせる
     }
-    public void AddWatcher(CommandSender sender, String[] args) {
+    public void AddWatcher(CommandSender sender, Object[] args) {
         // 観覧チームを追加
         // 既にあったら、エラー吐く
     }
-    public void RemoveWatcher(CommandSender sender, String[] args) {
+    public void RemoveWatcher(CommandSender sender, Object[] args) {
         // 観覧チームを削除
         // 0個だったら、エラー吐く
     }
@@ -191,7 +197,7 @@ public final class BattlePlugin extends JavaPlugin {
                     .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/battle start"))
                     .create();
         }
-        
+
 //        if (TP1 != null && TP2 != null && starting != null) {
 //            sender.sendMessage(check + "\n" + TP1 + "\n" + TP2 + "\n" + starting);
 //        }else if (TP1) {
@@ -200,5 +206,5 @@ public final class BattlePlugin extends JavaPlugin {
 //            sender.sendMessage(check + "\n" + TP2);
 //        }
     }
-    
+
 }
