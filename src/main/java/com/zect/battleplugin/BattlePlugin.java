@@ -1,5 +1,7 @@
 package com.zect.battleplugin;
 
+import static org.icecream.IceCream.ic;
+
 import dev.jorel.commandapi.*;
 import dev.jorel.commandapi.arguments.*;
 import net.md_5.bungee.api.ChatColor;
