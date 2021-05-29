@@ -6,11 +6,13 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +32,7 @@ public final class BattlePlugin extends JavaPlugin {
                 .withSubcommand(new CommandAPICommand("start")
                         .executes((sender, args) -> {
                             //perm group remove code
-                            sender.sendMessage("開始");
+//                            sender.sendMessage("開始");
                             GameStart(sender, args);
                         })
                 )
@@ -46,7 +48,7 @@ public final class BattlePlugin extends JavaPlugin {
                                 .withArguments(new StringArgument("groupName"))
                                 .executes((sender, args) -> {
                                     //perm group add code
-                                    sender.sendMessage("戦闘チームを追加");
+//                                    sender.sendMessage("戦闘チームを追加");
                                     AddFighters(sender,args);
                                 })
                         )
@@ -122,7 +124,9 @@ public final class BattlePlugin extends JavaPlugin {
             // ゲームが開始できない
             // 設定一覧を表示
             BaseComponent[] check = SettingList();
-            sender.sendMessage("[攻城戦支援プラグイン]\n" + checking + "\nが設定できていません\n" + check);
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + checking + "\nが設定できていないため、ゲームを開始できません。"
+            );
 
         }
         // ゲーム開始
@@ -131,6 +135,15 @@ public final class BattlePlugin extends JavaPlugin {
     public void AddFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム追加
         // 既に２つあったら、エラー吐かせる
+        sender.sendMessage((String) args[2]);
+//        Object FighterName = args[2];
+//        Server server = sender.getServer();
+//        Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam((String) FighterName);
+//        sender.sendMessage(
+//            ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+//                    + ChatColor.YELLOW + "[" + Fighter.getName() + "]\nを戦闘チームに追加しました。"
+//        );
+
     }
     public void RemoveFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム撤去
