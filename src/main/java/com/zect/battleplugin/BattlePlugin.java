@@ -28,6 +28,12 @@ public final class BattlePlugin extends JavaPlugin {
 
         String[] subCommandList = new String[] {"start", "check", "FightTeam", "WatcherTeam", "SetCorner", "SetTimeLimit"};
 
+        List<Argument> teamArgument = new ArrayList<>();
+        teamArgument.add(new TeamArgument("team").safeOverrideSuggestions(s ->
+            Bukkit.getScoreboardManager().getMainScoreboard().getTeams().toArray(new Team[0]))
+        );
+
+
         new CommandAPICommand("siege")
                 .withSubcommand(new CommandAPICommand("start")
                         .executes((sender, args) -> {
@@ -45,7 +51,7 @@ public final class BattlePlugin extends JavaPlugin {
                 )
                 .withSubcommand(new CommandAPICommand("FightTeam")
                         .withSubcommand(new CommandAPICommand("add")
-                                .withArguments(new StringArgument("groupName"))
+                                .withArguments(teamArgument)
                                 .executes((sender, args) -> {
                                     //perm group add code
 //                                    sender.sendMessage("戦闘チームを追加");
@@ -53,7 +59,7 @@ public final class BattlePlugin extends JavaPlugin {
                                 })
                         )
                         .withSubcommand(new CommandAPICommand("remove")
-                                .withArguments(new StringArgument("groupName"))
+                                .withArguments(teamArgument)
                                 .executes((sender, args) -> {
                                     //perm group remove code
                                     sender.sendMessage("戦闘チームを削除");
@@ -62,16 +68,16 @@ public final class BattlePlugin extends JavaPlugin {
                 )
                 .withSubcommand(new CommandAPICommand("WatchTeam")
                         .withSubcommand(new CommandAPICommand("add")
-                                .withArguments(new StringArgument("groupName"))
+                                .withArguments(teamArgument)
                                 .executes((sender, args) -> {
                                     //perm group add code
-//                    case args[2]
+//                    case args[0]
                                     sender.sendMessage("観覧チームを追加");
                                     AddFighters(sender,args);
                                 })
                         )
                         .withSubcommand(new CommandAPICommand("remove")
-                                .withArguments(new StringArgument("groupName"))
+                                .withArguments(teamArgument)
                                 .executes((sender, args) -> {
                                     //perm group remove code
                                     sender.sendMessage("観覧チームを削除");
