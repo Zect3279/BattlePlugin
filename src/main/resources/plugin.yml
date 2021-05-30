@@ -10,10 +10,12 @@ commands:
     description: battle helper command
     usage: |
       Use /help battle [subcommand] for more information
-      /battle start - ゲーム開始
-      /battle check - 現在の設定を表示
-      /battle SetFightTeam [チーム名] - 参加チームに登録
-      /battle SetWatchTeam [チーム名] - 観覧チームに登録
-      /battle SetBorder - 範囲を指定
-      /battle SetSpawn [チーム名] - 指定チームのスポーン地点を設定
-      /battle SetTimeLimit [秒数] - 制限時間を設定
+      /siege start - ゲーム開始
+      /siege check - 現在の設定を表示
+      /siege FightTeam add [チーム名] - 参加チームに登録
+      /siege FightTeam remove [チーム名] - 参加チームから削除
+      /siege WatchTeam add [チーム名] - 観覧チームに登録
+      /siege WatchTeam remove [チーム名] - 観覧チームから削除
+      /siege SetCorner - 範囲を指定
+      /siege SetSpawn [チーム名] - 指定チームのスポーン地点を設定
+      /siege SetTimeLimit [秒数] - 制限時間を設定
