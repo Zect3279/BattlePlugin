@@ -14,10 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Team;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 public final class BattlePlugin extends JavaPlugin {
@@ -112,8 +109,8 @@ public final class BattlePlugin extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    private Location ResTeam1;
-    private Location ResTeam2;
+    Map<String, Location> TeamRes = new HashMap<>();
+    Map<String, String> TeamName = new HashMap<>();
 
 //    public String CheckCanPlay() {
 //        // ゲーム開始可能か確認する
@@ -141,15 +138,49 @@ public final class BattlePlugin extends JavaPlugin {
     public void AddFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム追加
         // 既に２つあったら、エラー吐かせる
-        String fighter = (String) args[0]
-        sender.sendMessage(fighter);
-//        Object FighterName = args[2];
-//        Server server = sender.getServer();
-//        Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam((String) FighterName);
-//        sender.sendMessage(
-//            ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-//                    + ChatColor.YELLOW + "[" + Fighter.getName() + "]\nを戦闘チームに追加しました。"
-//        );
+        String fighter = (String) args[0];
+        Server server = sender.getServer();
+        Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
+
+        String Team1 = TeamName.get("Team1");
+        String Team2 = TeamName.get("Team2");
+        String FighterName = Fighter.getName();
+
+        if (Team1 == null) {
+            if (FighterName.equals(Team2)) {
+                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                        + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                        + ChatColor.GREEN + "は既に戦闘チームに追加されています。"
+                );
+            } else {
+                TeamName.put("Team1", FighterName);
+                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                        + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                        + ChatColor.GREEN + "を戦闘チームに追加しました。"
+                );
+            }
+        } else if (Team2 == null) {
+            if (FighterName.equals(Team1)) {
+                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                        + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                        + ChatColor.GREEN + "は既に戦闘チームに追加されています。"
+                );
+            } else {
+                TeamName.put("Team2", FighterName);
+                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                        + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                        + ChatColor.GREEN + "を戦闘チームに追加しました。"
+                );
+            }
+        } else {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "二チーム登録されているため、\nこれ以上のチームを登録することはできません。"
+                    + "\n別チームを登録したい場合は、\n"
+                    + ChatColor.GREEN + "/siege FightTeam remove <Team>\n"
+                    + ChatColor.RED + "でremoveできます。"
+
+            );
+        }
 
     }
     public void RemoveFighters(CommandSender sender, Object[] args) {
@@ -179,7 +210,7 @@ public final class BattlePlugin extends JavaPlugin {
         // チーム2のリス地へTP
         // ゲームスタートボタン
         BaseComponent[] check = SettingList();
-        if (ResTeam1 == null) {
+        if (TeamRes.get("Team1") == null) {
 //        if (ResTeam1 != null) {
             BaseComponent[] TP1 = new ComponentBuilder(
                 new TextComponent(new ComponentBuilder()
@@ -190,10 +221,10 @@ public final class BattlePlugin extends JavaPlugin {
                     .append("クリックでチーム1のリス地へTP")
                     .create()
                 ))
-                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + ResTeam1))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + TeamRes.get("Team1")))
                 .create();
         }
-        if (ResTeam2 == null) {
+        if (TeamRes.get("Team2") == null) {
 //        if (ResTeam2 != null) {
             BaseComponent[] TP2 = new ComponentBuilder(
                     new TextComponent(new ComponentBuilder()
@@ -204,7 +235,7 @@ public final class BattlePlugin extends JavaPlugin {
                         .append("クリックでチーム2リス地へTP")
                         .create()
                     ))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + ResTeam2))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + TeamRes.get("Team2")))
                     .create();
         }
         String checking = "ああ";
