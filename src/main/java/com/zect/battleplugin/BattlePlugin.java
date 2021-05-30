@@ -53,6 +53,11 @@ public final class BattlePlugin extends JavaPlugin {
                                 .executes(this::RemoveFighters)
                         )
                 )
+                .withSubcommand(new CommandAPICommand("Respawn")
+                        .withArguments(teamArgument)
+                        .withArguments(new LocationArgument("SpawnPoint"))
+                        .executes(this::SpawnPoint)
+                )
                 .withSubcommand(new CommandAPICommand("WatchTeam")
                         .withSubcommand(new CommandAPICommand("add")
                                 .withArguments(teamArgument)
@@ -181,7 +186,7 @@ public final class BattlePlugin extends JavaPlugin {
                     + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
                     + ChatColor.GREEN + "を戦闘チームから削除しました。"
             );
-        } else {
+        } else if (Team1 == null && Team2 == null) {
             sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
                     + ChatColor.RED + "チームリストに何も入っていないため、\nこれ以上チームを削除することはできません。"
                     + "\nチームを登録したい場合は、\n"
@@ -190,6 +195,11 @@ public final class BattlePlugin extends JavaPlugin {
 
             );
 
+        } else {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "指定されたチームは、戦闘チームに指定されていません。\n"
+                    + "チーム名を確認して、もう一度試してください。"
+            );
         }
 
     }
@@ -207,6 +217,74 @@ public final class BattlePlugin extends JavaPlugin {
     public void RemoveWatcher(CommandSender sender, Object[] args) {
         // 観覧チームを削除
         // 0個だったら、エラー吐く
+    }
+    public void SpawnPoint(CommandSender sender, Object[] args) {
+        // スポーン地点設定
+        String fighter = (String) args[0];
+        Server server = sender.getServer();
+        Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
+
+        Location Team1R = TeamRes.get("Team1");
+        Location Team2R = TeamRes.get("Team2");
+        String Team1N = TeamName.get("Team1");
+        String Team2N = TeamName.get("Team2");
+        String FighterName = Fighter.getName();
+        Location fighterRes = (Location) args[1];
+
+        if (!FighterName.equals(Team1N) && !FighterName.equals(Team2N)) {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "指定されたチームは、戦闘チームに指定されていません。\n"
+                    + "チーム名を確認して、もう一度試してください。"
+            );
+        } else if (FighterName.equals(Team1N)) {
+            TeamRes.put("Team1", fighterRes);
+            Integer x = fighterRes.getBlockX();
+            Integer y = fighterRes.getBlockY();
+            Integer z = fighterRes.getBlockZ();
+            BaseComponent[] TP1 = new ComponentBuilder(
+                    new TextComponent(new ComponentBuilder()
+                            .append("[Team1リス地へTP]").color(ChatColor.GOLD)
+                            .create())
+            )
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                            .append("クリックでチーム1のリス地へTP")
+                            .create()
+                    ))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + x + " " + y + " " + z))
+                    .create();
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                    + ChatColor.GREEN + "のリス地を設定しました。\n以下のブロックから設定場所にTPできます。"
+            );
+            sender.sendMessage(TP1);
+        } else if (FighterName.equals(Team2N)) {
+            TeamRes.put("Team2", fighterRes);
+            Integer x = fighterRes.getBlockX();
+            Integer y = fighterRes.getBlockY();
+            Integer z = fighterRes.getBlockZ();
+            BaseComponent[] TP2 = new ComponentBuilder(
+                    new TextComponent(new ComponentBuilder()
+                            .append("[Team2リス地へTP]").color(ChatColor.GOLD)
+                            .create())
+            )
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                            .append("クリックでチーム2のリス地へTP")
+                            .create()
+                    ))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + x + " " + y + " " + z))
+                    .create();
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                    + ChatColor.GREEN + "のリス地を設定しました。\n以下のブロックから設定場所にTPできます。"
+            );
+            sender.sendMessage(TP2);
+        } else {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "エラーが発生しました。\n"
+                    + "引数等を確認して、再度試してください。"
+            );
+        }
+
     }
     public void AddCorner(CommandSender sender, Object[] args) {
         // 角を追加
