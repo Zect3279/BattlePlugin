@@ -47,6 +47,13 @@ public final class BattlePlugin extends JavaPlugin {
                         })
                 )
                 .withSubcommand(new CommandAPICommand("FightTeam")
+                        .withSubcommand(new CommandAPICommand("list")
+                                .executes((sender, args) -> {
+                                    //perm group remove code
+                                    sender.sendMessage("戦闘チームを表示");
+                                    ShowFighters(sender,args);
+                                })
+                        )
                         .withSubcommand(new CommandAPICommand("add")
                                 .withArguments(teamArgument)
                                 .executes((sender, args) -> {
@@ -186,6 +193,13 @@ public final class BattlePlugin extends JavaPlugin {
     public void RemoveFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム撤去
         // 0個だったら、エラー吐かせる
+    }
+    public void ShowFighters(CommandSender sender, Object[] args) {
+        sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]"
+                + ChatColor.GREEN
+                + "\nチーム1 : " + TeamName.get("Team1")
+                + "\nチーム2 : " + TeamName.get("Team2")
+        );
     }
     public void AddWatcher(CommandSender sender, Object[] args) {
         // 観覧チームを追加
