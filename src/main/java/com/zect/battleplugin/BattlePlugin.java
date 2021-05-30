@@ -74,7 +74,7 @@ public final class BattlePlugin extends JavaPlugin {
                         .executes(this::AddCorner)
                 )
                 .withSubcommand(new CommandAPICommand("SetTimeLimit")
-                        .withArguments(new IntegerArgument("second"))
+                        .withArguments(new TimeArgument("second"))
                         .executes(this::SetTimeLimit)
                 )
                 .register();
