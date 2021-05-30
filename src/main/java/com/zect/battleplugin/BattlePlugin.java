@@ -31,77 +31,45 @@ public final class BattlePlugin extends JavaPlugin {
         );
 
 
+        //perm group add code
+        //                                    sender.sendMessage("戦闘チームを追加");
         new CommandAPICommand("siege")
                 .withSubcommand(new CommandAPICommand("start")
-                        .executes((sender, args) -> {
-                            //perm group remove code
-//                            sender.sendMessage("開始");
-                            GameStart(sender, args);
-                        })
+                        .executes(this::GameStart)
                 )
                 .withSubcommand(new CommandAPICommand("check")
-                        .executes((sender, args) -> {
-                            //perm group remove code
-                            sender.sendMessage("設定確認");
-                            CheckSettings(sender, args);
-                        })
+                        .executes(this::CheckSettings)
                 )
                 .withSubcommand(new CommandAPICommand("FightTeam")
                         .withSubcommand(new CommandAPICommand("list")
-                                .executes((sender, args) -> {
-                                    //perm group remove code
-                                    sender.sendMessage("戦闘チームを表示");
-                                    ShowFighters(sender,args);
-                                })
+                                .executes(this::ShowFighters)
                         )
                         .withSubcommand(new CommandAPICommand("add")
                                 .withArguments(teamArgument)
-                                .executes((sender, args) -> {
-                                    //perm group add code
-//                                    sender.sendMessage("戦闘チームを追加");
-                                    AddFighters(sender,args);
-                                })
+                                .executes(this::AddFighters)
                         )
                         .withSubcommand(new CommandAPICommand("remove")
                                 .withArguments(teamArgument)
-                                .executes((sender, args) -> {
-                                    //perm group remove code
-                                    sender.sendMessage("戦闘チームを削除");
-                                    RemoveFighters(sender,args);
-                                })
+                                .executes(this::RemoveFighters)
                         )
                 )
                 .withSubcommand(new CommandAPICommand("WatchTeam")
                         .withSubcommand(new CommandAPICommand("add")
                                 .withArguments(teamArgument)
-                                .executes((sender, args) -> {
-                                    //perm group add code
-//                    case args[0]
-                                    sender.sendMessage("観覧チームを追加");
-                                    AddFighters(sender,args);
-                                })
+                                .executes(this::AddWatcher)
                         )
                         .withSubcommand(new CommandAPICommand("remove")
                                 .withArguments(teamArgument)
-                                .executes((sender, args) -> {
-                                    //perm group remove code
-                                    sender.sendMessage("観覧チームを削除");
-                                })
+                                .executes(this::RemoveWatcher)
                         )
                 )
                 .withSubcommand(new CommandAPICommand("SetCorner")
                         .withArguments(new LocationArgument("location"))
-                        .executes((sender, args) -> {
-                            //perm group remove code
-                            sender.sendMessage("座標を登録");
-                        })
+                        .executes(this::AddCorner)
                 )
                 .withSubcommand(new CommandAPICommand("SetTimeLimit")
                         .withArguments(new IntegerArgument("second"))
-                        .executes((sender, args) -> {
-                            //perm group remove code
-                            sender.sendMessage("時間制限を追加");
-                        })
+                        .executes(this::SetTimeLimit)
                 )
                 .register();
     }
@@ -239,6 +207,12 @@ public final class BattlePlugin extends JavaPlugin {
     public void RemoveWatcher(CommandSender sender, Object[] args) {
         // 観覧チームを削除
         // 0個だったら、エラー吐く
+    }
+    public void AddCorner(CommandSender sender, Object[] args) {
+        // 角を追加
+    }
+    public void SetTimeLimit(CommandSender sender, Object[] args) {
+        // 時間制限を追加
     }
     public BaseComponent[] SettingList() {
         BaseComponent[] settings = new ComponentBuilder(
