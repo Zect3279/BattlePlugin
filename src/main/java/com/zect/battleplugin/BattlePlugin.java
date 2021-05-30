@@ -18,15 +18,19 @@ public final class BattlePlugin extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        // おまじない
         CommandAPI.onLoad(true);
 
-//        String[] subCommandList = new String[] {"start", "check", "FightTeam", "WatcherTeam", "SetCorner", "SetTimeLimit"};
+        // サブコマンドリスト　使うかもしれない
+//        String[] subCommandList = new String[] {"start", "check", "FightTeam", "WatcherTeam",　"Respawn", "SetCorner", "SetTimeLimit"};
 
+        // チーム一覧をコマンド入力時に出力するための変数
         List<Argument> teamArgument = new ArrayList<>();
         teamArgument.add(new TeamArgument("team").safeOverrideSuggestions(s ->
             Bukkit.getScoreboardManager().getMainScoreboard().getTeams().toArray(new Team[0]))
         );
 
+        // コマンドを設定する
         new CommandAPICommand("siege")
                 .withSubcommand(new CommandAPICommand("start")
                         .executes(this::GameStart)
@@ -79,6 +83,7 @@ public final class BattlePlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
+        // おまじない
         CommandAPI.onEnable(this);
     }
 
@@ -87,7 +92,9 @@ public final class BattlePlugin extends JavaPlugin {
         // Plugin shutdown logic
     }
 
+    // リスポーン地点を保存
     Map<String, Location> TeamRes = new HashMap<>();
+    // <Team, Team.getName()> チーム番号と名前を保存
     Map<String, String> TeamName = new HashMap<>();
 
     public void CheckCanPlay() {
@@ -121,13 +128,18 @@ public final class BattlePlugin extends JavaPlugin {
     }
     public void AddFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム追加
+
+        // コマンド入力時に取得したチーム名からチームオブジェクトを持ってくる
         String fighter = (String) args[0];
         Server server = sender.getServer();
         Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
 
+        // 登録されてるかもしれないチーム名を取得
+        // 1,2は戦闘、3は観覧
         String Team1 = TeamName.get("Team1");
         String Team2 = TeamName.get("Team2");
         String Team3 = TeamName.get("Team3");
+        // 登録しようとしてるチームの名前を取得
         String FighterName = Fighter.getName();
 
         if (FighterName == Team3) {
@@ -174,7 +186,8 @@ public final class BattlePlugin extends JavaPlugin {
     }
     public void RemoveFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム撤去
-        // 0個だったら、エラー吐かせる
+
+        // 細かい説明は、AddFightersを見てね
         String fighter = (String) args[0];
         Server server = sender.getServer();
         Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
@@ -213,6 +226,8 @@ public final class BattlePlugin extends JavaPlugin {
 
     }
     public void ShowFighters(CommandSender sender, Object[] args) {
+        // チーム一覧を表示
+        // 設定されてなかったら、nullが返る
         sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]"
                 + ChatColor.GREEN
                 + "\n戦闘チーム1 : " + TeamName.get("Team1")
@@ -221,7 +236,8 @@ public final class BattlePlugin extends JavaPlugin {
     }
     public void AddWatcher(CommandSender sender, Object[] args) {
         // 観覧チームを追加
-        // 既にあったら、エラー吐く
+
+        // 細かい説明は、AddFightersに書いてある
         String watcher = (String) args[0];
         Server server = sender.getServer();
         Team Watcher = server.getScoreboardManager().getMainScoreboard().getTeam(watcher);
@@ -262,7 +278,8 @@ public final class BattlePlugin extends JavaPlugin {
     }
     public void RemoveWatcher(CommandSender sender, Object[] args) {
         // 観覧チームを削除
-        // 0個だったら、エラー吐く
+
+        // 細かい説明は、AddFightersに書いてある
         String watcher = (String) args[0];
         Server server = sender.getServer();
         Team Watcher = server.getScoreboardManager().getMainScoreboard().getTeam(watcher);
@@ -292,6 +309,7 @@ public final class BattlePlugin extends JavaPlugin {
         }
     }
     public void ShowWatchers(CommandSender sender, Object[] args) {
+        // 観覧チームを表示
         sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]"
                 + ChatColor.GREEN
                 + "\n観覧チーム : " + TeamName.get("Team3")
@@ -315,9 +333,12 @@ public final class BattlePlugin extends JavaPlugin {
             );
         } else if (FighterName.equals(Team1N)) {
             TeamRes.put("Team1", fighterRes);
+            // 設定したリスポーン地点の座標をx,y,zに保存
             Integer x = fighterRes.getBlockX();
             Integer y = fighterRes.getBlockY();
             Integer z = fighterRes.getBlockZ();
+
+            // クリックしたらTPする不思議なブロックを生成
             BaseComponent[] TP1 = new ComponentBuilder(
                     new TextComponent(new ComponentBuilder()
                             .append("[Team1リス地へTP]").color(ChatColor.GOLD)
@@ -364,9 +385,9 @@ public final class BattlePlugin extends JavaPlugin {
 
     }
     public BaseComponent[] SettingList() {
+        // 設定一覧を作成して、返す
         BaseComponent[] settings = new ComponentBuilder(
                 new TextComponent(new ComponentBuilder()
-                    .append("[攻城戦支援プラグイン]\n").color(ChatColor.LIGHT_PURPLE)
                     .append("設定一覧を表示予定").color(ChatColor.GREEN)
                     .create())
             ).create();
