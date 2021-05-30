@@ -94,8 +94,12 @@ public final class BattlePlugin extends JavaPlugin {
 
     // リスポーン地点を保存
     Map<String, Location> TeamRes = new HashMap<>();
+
     // <Team, Team.getName()> チーム番号と名前を保存
     Map<String, String> TeamName = new HashMap<>();
+
+    // 戦闘範囲の角
+    ArrayList<Location> Corner = new ArrayList<>();
 
     public void CheckCanPlay() {
         // ゲーム開始可能か確認する
@@ -120,13 +124,60 @@ public final class BattlePlugin extends JavaPlugin {
         // ゲーム開始
         GameController.start();
     }
-    public void AddCorner(CommandSender sender, Object[] args) {
-        // 角を追加
-        // TODO: 角を決めるプログラムを作成する [最小範囲は実装しなくていい] [設定場所に飛べるようにしたい]
-    }
     public void SetTimeLimit(CommandSender sender, Object[] args) {
         // 時間制限を追加
         // TODO: 時間制限を設けるプログラムを実装する [デフォルト値も設定する]
+    }
+    public void AddCorner(CommandSender sender, Object[] args) {
+        // 角を追加
+        // TODO: 角を決めるプログラムを作成する [最小範囲は実装しなくていい] [設定場所に飛べるようにしたい]
+        Location corner = (Location) args[0];
+
+        Location Corner1 = Corner.get(0);
+        Location Corner2 = Corner.get(1);
+
+        Integer x = corner.getBlockX();
+        Integer y = corner.getBlockY();
+        Integer z = corner.getBlockZ();
+
+        // クリックしたらTPする不思議なブロックを生成
+        BaseComponent[] TP = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                        .append("[設定した地点へTP]").color(ChatColor.GOLD)
+                        .create())
+        )
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                        .append("クリックで設定した角へTP")
+                        .create()
+                ))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + x + " " + y + " " + z))
+                .create();
+
+        if (corner == Corner1 || corner == Corner2) {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "この座標は既に登録されています。\n"
+                    + "座標を確認して、再度実行してください。"
+            );
+        } else if (Corner.size() < 3) {
+            Corner.add(corner);
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.GREEN + "範囲の角を一つ指定しました。\n"
+                    + "以下のブロックからTPできます。"
+            );
+            sender.sendMessage(TP);
+        } else if (Corner.size() > 2){
+            Corner.remove(0);
+            Corner.add(corner);
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.GREEN + "範囲の角を一つ指定しました。\n"
+                    + "以下のブロックからTPできます。"
+            );
+            sender.sendMessage(TP);
+        } else {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "エラーが発生しました。\n入力したコマンドを確認して、もう一度試してください。"
+            );
+        }
     }
     public void AddFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム追加
