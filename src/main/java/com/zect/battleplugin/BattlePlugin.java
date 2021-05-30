@@ -47,12 +47,10 @@ public final class BattlePlugin extends JavaPlugin {
                                 .executes(this::RemoveFighters)
                         )
                 )
-                .withSubcommand(new CommandAPICommand("Respawn")
-                        .withArguments(teamArgument)
-                        .withArguments(new LocationArgument("SpawnPoint"))
-                        .executes(this::SpawnPoint)
-                )
                 .withSubcommand(new CommandAPICommand("WatchTeam")
+                        .withSubcommand(new CommandAPICommand("list")
+                                .executes(this::ShowWatchers)
+                        )
                         .withSubcommand(new CommandAPICommand("add")
                                 .withArguments(teamArgument)
                                 .executes(this::AddWatcher)
@@ -61,6 +59,11 @@ public final class BattlePlugin extends JavaPlugin {
                                 .withArguments(teamArgument)
                                 .executes(this::RemoveWatcher)
                         )
+                )
+                .withSubcommand(new CommandAPICommand("Respawn")
+                        .withArguments(teamArgument)
+                        .withArguments(new LocationArgument("SpawnPoint"))
+                        .executes(this::SpawnPoint)
                 )
                 .withSubcommand(new CommandAPICommand("SetCorner")
                         .withArguments(new LocationArgument("location"))
@@ -118,9 +121,15 @@ public final class BattlePlugin extends JavaPlugin {
 
         String Team1 = TeamName.get("Team1");
         String Team2 = TeamName.get("Team2");
+        String Team3 = TeamName.get("Team3");
         String FighterName = Fighter.getName();
 
-        if (Team1 == null) {
+        if (FighterName == Team3) {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                    + ChatColor.GREEN + "は観覧チームに参加しているため、攻城戦には参加できません。"
+            );
+        } else if (Team1 == null) {
             if (FighterName.equals(Team2)) {
                 sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
                         + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
@@ -191,7 +200,7 @@ public final class BattlePlugin extends JavaPlugin {
 
         } else {
             sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + "指定されたチームは、戦闘チームに指定されていません。\n"
+                    + ChatColor.RED + "指定されたチームは、戦闘チームに設定されていません。\n"
                     + "チーム名を確認して、もう一度試してください。"
             );
         }
@@ -200,17 +209,87 @@ public final class BattlePlugin extends JavaPlugin {
     public void ShowFighters(CommandSender sender, Object[] args) {
         sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]"
                 + ChatColor.GREEN
-                + "\nチーム1 : " + TeamName.get("Team1")
-                + "\nチーム2 : " + TeamName.get("Team2")
+                + "\n戦闘チーム1 : " + TeamName.get("Team1")
+                + "\n戦闘チーム2 : " + TeamName.get("Team2")
         );
     }
     public void AddWatcher(CommandSender sender, Object[] args) {
         // 観覧チームを追加
         // 既にあったら、エラー吐く
+        String watcher = (String) args[0];
+        Server server = sender.getServer();
+        Team Watcher = server.getScoreboardManager().getMainScoreboard().getTeam(watcher);
+
+        String Team1 = TeamName.get("Team1");
+        String Team2 = TeamName.get("Team2");
+        String Team3 = TeamName.get("Team3");
+        String FighterName = Watcher.getName();
+
+        if (FighterName == Team1 || FighterName == Team2) {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + Watcher.getColor() + "[" + Watcher.getName() + "]\n"
+                    + ChatColor.GREEN + "は戦闘チームに参加しているため、攻城戦の観覧はできません。"
+            );
+        } else if (Team3 == null) {
+            if (FighterName.equals(Team3)) {
+                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                        + Watcher.getColor() + "[" + Watcher.getName() + "]\n"
+                        + ChatColor.GREEN + "は既に観覧チームに追加されています。"
+                );
+            } else {
+                TeamName.put("Team3", FighterName);
+                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                        + Watcher.getColor() + "[" + Watcher.getName() + "]\n"
+                        + ChatColor.GREEN + "を観覧チームに追加しました。"
+                );
+            }
+        } else {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "既に登録されているため、\nこれ以上のチームを登録することはできません。"
+                    + "\n別チームを登録したい場合は、\n"
+                    + ChatColor.GREEN + "/siege FightTeam remove <Team>\n"
+                    + ChatColor.RED + "でremoveした後に、もう一度試してください。"
+
+            );
+        }
+
     }
     public void RemoveWatcher(CommandSender sender, Object[] args) {
         // 観覧チームを削除
         // 0個だったら、エラー吐く
+        String watcher = (String) args[0];
+        Server server = sender.getServer();
+        Team Watcher = server.getScoreboardManager().getMainScoreboard().getTeam(watcher);
+
+        String Team3 = TeamName.get("Team3");
+        String FighterName = Watcher.getName();
+
+        if (FighterName == Team3) {
+            TeamName.put("Team3", null);
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + Watcher.getColor() + "[" + Watcher.getName() + "]\n"
+                    + ChatColor.GREEN + "を観覧チームから削除しました。"
+            );
+        } else if (Team3 == null) {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "チームリストに何も入っていないため、\nこれ以上チームを削除することはできません。"
+                    + "\nチームを登録したい場合は、\n"
+                    + ChatColor.GREEN + "/siege WatchTeam add <Team>\n"
+                    + ChatColor.RED + "で追加できます。"
+
+            );
+        } else {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "指定されたチームは、観覧チームに設定されていません。\n"
+                    + "チーム名を確認して、もう一度試してください。"
+            );
+        }
+    }
+    public void ShowWatchers(CommandSender sender, Object[] args) {
+        sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]"
+                + ChatColor.GREEN
+                + "\n観覧チーム : " + TeamName.get("Team3")
+        );
     }
     public void SpawnPoint(CommandSender sender, Object[] args) {
         // スポーン地点設定
@@ -225,7 +304,7 @@ public final class BattlePlugin extends JavaPlugin {
 
         if (!FighterName.equals(Team1N) && !FighterName.equals(Team2N)) {
             sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + "指定されたチームは、戦闘チームに指定されていません。\n"
+                    + ChatColor.RED + "指定されたチームは、戦闘チームに設定されていません。\n"
                     + "チーム名を確認して、もう一度試してください。"
             );
         } else if (FighterName.equals(Team1N)) {
