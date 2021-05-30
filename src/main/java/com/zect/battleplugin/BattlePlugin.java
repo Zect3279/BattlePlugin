@@ -122,7 +122,7 @@ public final class BattlePlugin extends JavaPlugin {
     }
     public void AddCorner(CommandSender sender, Object[] args) {
         // 角を追加
-        // TODO: 角を決めるプログラムを作成する [最小範囲は実装しなくていい]
+        // TODO: 角を決めるプログラムを作成する [最小範囲は実装しなくていい] [設定場所に飛べるようにしたい]
     }
     public void SetTimeLimit(CommandSender sender, Object[] args) {
         // 時間制限を追加
