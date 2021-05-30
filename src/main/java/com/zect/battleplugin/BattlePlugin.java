@@ -101,6 +101,9 @@ public final class BattlePlugin extends JavaPlugin {
     // 戦闘範囲の角
     ArrayList<Location> Corner = new ArrayList<>();
 
+    // デフォルトの秒数を300秒に
+    public Integer timeLimit = 300;
+
     public void CheckCanPlay() {
         // ゲーム開始可能か確認する
         // 開始できなかったら、reasonを返す
@@ -126,7 +129,15 @@ public final class BattlePlugin extends JavaPlugin {
     }
     public void SetTimeLimit(CommandSender sender, Object[] args) {
         // 時間制限を追加
-        // TODO: 時間制限を設けるプログラムを実装する [デフォルト値も設定する]
+        Integer before = timeLimit;
+        timeLimit = (Integer) args[0];
+        sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                + ChatColor.GREEN + "攻城戦の制限時間を\n"
+                + ChatColor.YELLOW + "[" + before + "]"
+                + ChatColor.GREEN + "から"
+                + ChatColor.YELLOW + "[" + timeLimit + "]\n"
+                + ChatColor.GREEN + "に設定しました。"
+        );
     }
     public void AddCorner(CommandSender sender, Object[] args) {
         // 角を追加
