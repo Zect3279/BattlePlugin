@@ -67,6 +67,7 @@ public final class BattlePlugin extends JavaPlugin {
                                 .executes((sender, args) -> {
                                     //perm group remove code
                                     sender.sendMessage("戦闘チームを削除");
+                                    RemoveFighters(sender,args);
                                 })
                         )
                 )
@@ -144,7 +145,6 @@ public final class BattlePlugin extends JavaPlugin {
     }
     public void AddFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム追加
-        // 既に２つあったら、エラー吐かせる
         String fighter = (String) args[0];
         Server server = sender.getServer();
         Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
@@ -184,7 +184,7 @@ public final class BattlePlugin extends JavaPlugin {
                     + ChatColor.RED + "二チーム登録されているため、\nこれ以上のチームを登録することはできません。"
                     + "\n別チームを登録したい場合は、\n"
                     + ChatColor.GREEN + "/siege FightTeam remove <Team>\n"
-                    + ChatColor.RED + "でremoveできます。"
+                    + ChatColor.RED + "でremoveした後に、もう一度試してください。"
 
             );
         }
@@ -193,6 +193,37 @@ public final class BattlePlugin extends JavaPlugin {
     public void RemoveFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム撤去
         // 0個だったら、エラー吐かせる
+        String fighter = (String) args[0];
+        Server server = sender.getServer();
+        Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
+
+        String Team1 = TeamName.get("Team1");
+        String Team2 = TeamName.get("Team2");
+        String FighterName = Fighter.getName();
+
+        if (FighterName == Team1) {
+            TeamName.put("Team1", null);
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                    + ChatColor.GREEN + "を戦闘チームから削除しました。"
+            );
+        } else if (FighterName == Team2) {
+            TeamName.put("Team2", null);
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                    + ChatColor.GREEN + "を戦闘チームから削除しました。"
+            );
+        } else {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "チームリストに何も入っていないため、\nこれ以上チームを削除することはできません。"
+                    + "\nチームを登録したい場合は、\n"
+                    + ChatColor.GREEN + "/siege FightTeam add <Team>\n"
+                    + ChatColor.RED + "で追加できます。"
+
+            );
+
+        }
+
     }
     public void ShowFighters(CommandSender sender, Object[] args) {
         sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]"
