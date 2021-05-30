@@ -113,6 +113,12 @@ public final class BattlePlugin extends JavaPlugin {
         // ゲーム開始
         GameController.start();
     }
+    public void AddCorner(CommandSender sender, Object[] args) {
+        // 角を追加
+    }
+    public void SetTimeLimit(CommandSender sender, Object[] args) {
+        // 時間制限を追加
+    }
     public void AddFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム追加
         String fighter = (String) args[0];
@@ -356,12 +362,6 @@ public final class BattlePlugin extends JavaPlugin {
             );
         }
 
-    }
-    public void AddCorner(CommandSender sender, Object[] args) {
-        // 角を追加
-    }
-    public void SetTimeLimit(CommandSender sender, Object[] args) {
-        // 時間制限を追加
     }
     public BaseComponent[] SettingList() {
         BaseComponent[] settings = new ComponentBuilder(
