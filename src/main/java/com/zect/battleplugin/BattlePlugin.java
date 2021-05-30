@@ -135,7 +135,8 @@ public final class BattlePlugin extends JavaPlugin {
     public void AddFighters(CommandSender sender, Object[] args) {
         // 戦闘チーム追加
         // 既に２つあったら、エラー吐かせる
-        sender.sendMessage((String) args[2]);
+        String fighter = (String) args[0]
+        sender.sendMessage(fighter);
 //        Object FighterName = args[2];
 //        Server server = sender.getServer();
 //        Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam((String) FighterName);
