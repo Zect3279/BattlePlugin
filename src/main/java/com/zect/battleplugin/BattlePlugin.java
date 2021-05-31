@@ -122,13 +122,6 @@ public final class BattlePlugin extends JavaPlugin {
         
         Server server = sender.getServer();
         Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
-        Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
-        Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
-        Team Team3 = MainBoard.getTeam(TeamName.get("Team3"));
-        Location Corner1 = Corner.get(0);
-        Location Corner2 = Corner.get(1);
-        Location Spawn1 = TeamRes.get("Team1");
-        Location Spawn2 = TeamRes.get("Team2");
         /* 引数
         * - [x] 戦闘チーム
         * - [x] 観覧チーム
