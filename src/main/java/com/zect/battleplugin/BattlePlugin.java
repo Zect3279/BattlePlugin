@@ -107,8 +107,27 @@ public final class BattlePlugin extends JavaPlugin {
     public void CheckCanPlay() {
         // ゲーム開始可能か確認する
         // 開始できなかったら、reasonを返す
-
         // ゲームが開始できるなら、nullを返す
+        
+        /* ゲーム開始条件
+        *  - 戦闘チームが２つある 
+        *  - 範囲指定用の角が２つある
+        *  - スポーン/リスポーン地点が２つ設定されてる
+        *  - 
+        */
+        
+        Server server = sender.getServer();
+        Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
+        Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
+        Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
+        Location Corner1 = Corner.get(0);
+        Location Corner2 = Corner.get(1);
+        Location Spawn1 = TeamRes.get("Team1");
+        Location Spawn2 = TeamRes.get("Team2");
+        
+        if (Team1 == null || Team2 == null || Corner1 == null || Corner2 == null || Spawn1 == null || Spawn == null) {
+            // エラー吐かせる
+        }
     }
 
     public void GameStart(CommandSender sender, Object[] args) {
