@@ -104,7 +104,7 @@ public final class BattlePlugin extends JavaPlugin {
     // デフォルトの秒数を300秒に
     public Integer timeLimit = 300;
 
-    public void CheckCanPlay() {
+    public String CheckCanPlay() {
         // ゲーム開始可能か確認する
         // 開始できなかったら、reasonを返す
         // ゲームが開始できるなら、nullを返す
@@ -113,7 +113,6 @@ public final class BattlePlugin extends JavaPlugin {
         *  - 戦闘チームが２つある 
         *  - 範囲指定用の角が２つある
         *  - スポーン/リスポーン地点が２つ設定されてる
-        *  - 
         */
         
         Server server = sender.getServer();
@@ -125,11 +124,23 @@ public final class BattlePlugin extends JavaPlugin {
         Location Spawn1 = TeamRes.get("Team1");
         Location Spawn2 = TeamRes.get("Team2");
         
-        if (Team1 == null || Team2 == null || Corner1 == null || Corner2 == null || Spawn1 == null || Spawn == null) {
-            // エラー吐かせる
+        String cantStart;
+        
+        // 開始条件のどれか一つでも無かったら、開始できない
+        if (Team1 == null || Team2 == null || Corner1 == null || Corner2 == null || Spawn1 == null || Spawn2 == null) {
+            // 上のどれかがnullだったら実行
+            if (Team1 == null || Team2 == null) {
+                cantStart += "\n- 2つの戦闘チーム"
+            }
+            if (Corner1 == null || Corner2 == null) {
+                cantStart += "\n- 戦闘範囲の2つの角"
+            }
+            if (Spawn1 == null || Spawn2 == null) {
+                cantStart += "\n- 2つのスポーン地点"
+            }
         }
+        return cantStart;
     }
-
     public void GameStart(CommandSender sender, Object[] args) {
         // ゲーム開始できるか判定する
         String checking = "ああ";
@@ -139,7 +150,7 @@ public final class BattlePlugin extends JavaPlugin {
             // 設定一覧を表示
             BaseComponent[] check = SettingList();
             sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + checking + "\nが設定できていないため、ゲームを開始できません。"
+                    + ChatColor.RED + check + "\nが設定できていないため、ゲームを開始できません。"
             );
 
         }
@@ -466,53 +477,16 @@ public final class BattlePlugin extends JavaPlugin {
         }
 
     }
-    public BaseComponent[] SettingList() {
-        // 設定一覧を作成して、返す
-        BaseComponent[] settings = new ComponentBuilder(
-                new TextComponent(new ComponentBuilder()
-                    .append("設定一覧を表示予定").color(ChatColor.GREEN)
-                    .create())
-            ).create();
-        return settings;
-    }
     public void CheckSettings(CommandSender sender, Object[] args) {
         // 設定一覧を表示
         // チーム1のリス地へTP
         // チーム2のリス地へTP
         // ゲームスタートボタン
+        BaseComponent[] starting;
         BaseComponent[] check = SettingList();
-//        if (TeamRes.get("Team1") == null) {
-//        if (ResTeam1 != null) {
-            BaseComponent[] TP1 = new ComponentBuilder(
-                new TextComponent(new ComponentBuilder()
-                        .append("[Team1リス地へTP]").color(ChatColor.GOLD)
-                        .create())
-            )
-                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                    .append("クリックでチーム1のリス地へTP")
-                    .create()
-                ))
-                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + TeamRes.get("Team1")))
-                .create();
-//        }
-//        if (TeamRes.get("Team2") == null) {
-//        if (ResTeam2 != null) {
-            BaseComponent[] TP2 = new ComponentBuilder(
-                    new TextComponent(new ComponentBuilder()
-                            .append("[Team2リス地へTP]").color(ChatColor.GOLD)
-                            .create())
-            )
-                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                        .append("クリックでチーム2リス地へTP")
-                        .create()
-                    ))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, ("/tp ") + TeamRes.get("Team2")))
-                    .create();
-//        }
-//        String checking = "ああ";
-//        String checking = CheckCanPlay();
-//        if (checking == null) {
-            BaseComponent[] starting = new ComponentBuilder(
+        String checking = CheckCanPlay();
+        if (checking == null) {
+            starting = new ComponentBuilder(
                     new TextComponent(new ComponentBuilder()
                             .append("[クリックで対戦を開始]").color(ChatColor.GOLD)
                             .create())
@@ -525,7 +499,84 @@ public final class BattlePlugin extends JavaPlugin {
                     .create();
 //        }
 
-        sender.sendMessage(check + "\n" + TP1 + "\n" + TP2 + "\n" + starting);
+        sender.sendMessage(check + "\n\n" + starting);
+    }
+    public BaseComponent[] SettingList() {
+        Server server = sender.getServer();
+        Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
+        Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
+        Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
+        Team Team3 = MainBoard.getTeam(TeamName.get("Team3"));
+        Location Corner1 = Corner.get(0);
+        Location Corner2 = Corner.get(1);
+        Location Spawn1 = TeamRes.get("Team1");
+        Location Spawn2 = TeamRes.get("Team2");
+        // 設定一覧を作成して、返す
+        BaseComponent[] TeamList = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                    .append(
+                          "\n- 戦闘チーム1 : " + Team1
+                        + "\n- 戦闘チーム2 : " + Team2
+                        + "\n- 観覧チーム : " + Team3
+                    ).color(ChatColor.GREEN)
+                    .create())
+            ).create();
+            // 設定したリスポーン地点の座標をx,y,zに保存
+            String cor1 = Corner1.getBlockX() + " " + Corner1.getBlockY() + " " + Corner1.getBlockZ();
+            String cor2 = Corner2.getBlockX() + " " + Corner2.getBlockY() + " " + Corner2.getBlockZ();
+            String spa1 = Spawn1.getBlockX() + " " + Spawn1.getBlockY() + " " + Spawn1.getBlockZ();
+            String spa2 = Spawn2.getBlockX() + " " + Spawn2.getBlockY() + " " + Spawn2.getBlockZ();
+
+            // クリックしたらTPする不思議なブロックを生成
+            BaseComponent[] TP1 = new ComponentBuilder(
+                    new TextComponent(new ComponentBuilder()
+                            .append("\n- チーム1のリス地 : " + spa1).color(ChatColor.GREEN)
+                            .create())
+            )
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                            .append("クリックでチーム1のリス地へTP")
+                            .create()
+                    ))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + spa1))
+                    .create();
+            BaseComponent[] TP2 = new ComponentBuilder(
+                    new TextComponent(new ComponentBuilder()
+                            .append("\n- チーム2のリス地 : " + spa2).color(ChatColor.GREEN)
+                            .create())
+            )
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                            .append("クリックでチーム2のリス地へTP")
+                            .create()
+                    ))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + spa2))
+                    .create();
+            BaseComponent[] TPCor1 = new ComponentBuilder(
+                    new TextComponent(new ComponentBuilder()
+                            .append("\n- 戦闘範囲の角1 : " + cor1).color(ChatColor.GREEN)
+                            .create())
+            )
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                            .append("クリックで角1にTP")
+                            .create()
+                    ))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + cor1))
+                    .create();
+            BaseComponent[] TPCor2 = new ComponentBuilder(
+                    new TextComponent(new ComponentBuilder()
+                            .append("\n- 戦闘範囲の角2 : " + cor2).color(ChatColor.GREEN)
+                            .create())
+            )
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                            .append("クリックで角2にTP")
+                            .create()
+                    ))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + cor2))
+                    .create();
+        
+        // 全部を結合
+        BaseComponent[] settigs = TeamList + TP1 + TP2 + TPCor1 + TPCor2
+        
+        return settings;
     }
 
 }
