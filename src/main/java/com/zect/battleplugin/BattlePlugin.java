@@ -104,6 +104,42 @@ public final class BattlePlugin extends JavaPlugin {
     // デフォルトの秒数を300秒に
     public Integer timeLimit = 300;
 
+    
+    public void GameStart(CommandSender sender, Object[] args) {
+        // ゲーム開始できるか判定する
+//         String checking = "ああ";
+       String checking = CheckCanPlay();
+        if (checking != null) {
+            // ゲームが開始できない
+            // 設定一覧を表示
+            BaseComponent[] check = SettingList();
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + check + "\nが設定できていないため、ゲームを開始できません。"
+            );
+
+        }
+        // ゲーム開始
+        
+        Server server = sender.getServer();
+        Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
+        Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
+        Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
+        Team Team3 = MainBoard.getTeam(TeamName.get("Team3"));
+        Location Corner1 = Corner.get(0);
+        Location Corner2 = Corner.get(1);
+        Location Spawn1 = TeamRes.get("Team1");
+        Location Spawn2 = TeamRes.get("Team2");
+        /* 引数
+        * - [x] 戦闘チーム
+        * - [x] 観覧チーム
+        * - [x] リス地
+        * - [x] 範囲
+        * - [x] 制限時間
+        * - [x] スコアボードobj
+        * - [x] サーバーobj
+        */
+        GameController.start(server, MainBoard, TeamName, Corner, TeamRes, timeLimit);
+    }
     public String CheckCanPlay() {
         // ゲーム開始可能か確認する
         // 開始できなかったら、reasonを返す
@@ -140,22 +176,6 @@ public final class BattlePlugin extends JavaPlugin {
             }
         }
         return cantStart;
-    }
-    public void GameStart(CommandSender sender, Object[] args) {
-        // ゲーム開始できるか判定する
-        String checking = "ああ";
-//        String checking = CheckCanPlay();
-        if (checking != null) {
-            // ゲームが開始できない
-            // 設定一覧を表示
-            BaseComponent[] check = SettingList();
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + check + "\nが設定できていないため、ゲームを開始できません。"
-            );
-
-        }
-        // ゲーム開始
-        GameController.start();
     }
     public void SetTimeLimit(CommandSender sender, Object[] args) {
         // 時間制限を追加
