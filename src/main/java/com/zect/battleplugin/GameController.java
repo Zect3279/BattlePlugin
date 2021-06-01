@@ -44,25 +44,32 @@ public class GameController extends JavaPlugin {
         * ボーダー処理・殺害処理・勝敗判定
         * の関数を発火
         */
-        
-        ExecutorService es = Executors.newFixedThreadPool(2);
-        try {
-            es.execute(() -> Bording());
-            es.execute(() -> KillCount());
-            es.execute(() -> WinChecker());
-        } finally {
-        es.shutdown();
-        es.awaitTermination(1, TimeUnit.MINUTES);
-    }
-    public void Bording() {
+        Integer num = 5;
+        ExecutorService exec = Executors.newCachedThreadPool();
+        while (num > 0) {
+            exec.submit(new Bording());
+            exec.submit(new KillCount());
+            exec.submit(new WinChecker());
+        }
+}
+
+public class Bording implements Runnable {
+
+    public void run() {
         // ボーダー処理
     }
-    public void KillCount() {
-        // 殺害処理
+}
+public class KillCount implements Runnable {
+
+    public void run() {
+        // 殺害判定
     }
-    public void WinChecker() {
+}
+public class WinChecker implements Runnable {
+
+    public void run() {
         // 勝敗判定
     }
-  
-
 }
+
+
