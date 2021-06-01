@@ -2,7 +2,7 @@ package com.zect.battleplugin;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class GameController extends JavaPlugin, Thread {
+public class GameController extends JavaPlugin {
 
     public static void start(Server server, Scoreboard MainBoard, Map<String, String> TeamName, Location Corner, Map<String, Location> TeamRes, Integer timeLimit) {
         /* 引数
@@ -39,12 +39,18 @@ public class GameController extends JavaPlugin, Thread {
         * 『ゲーム開始』
         */
     }
-    public static void Controll() {
+    public static void Controll() throws Exception {
         /*
         * ボーダー処理・殺害処理・勝敗判定
         * の関数を発火
         */
-        t1 = Bording();
+        
+        ExecutorService es = Executors.newFixedThreadPool(2);
+        try {
+            es.execute(() -> Bording());
+            es.execute(() -> KillCount());
+            es.execute(() -> WinChecker());
+        }
     }
     public void Bording() {
         // ボーダー処理
