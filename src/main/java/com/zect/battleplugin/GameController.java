@@ -50,7 +50,9 @@ public class GameController extends JavaPlugin {
             es.execute(() -> Bording());
             es.execute(() -> KillCount());
             es.execute(() -> WinChecker());
-        }
+        } finally {
+        es.shutdown();
+        es.awaitTermination(1, TimeUnit.MINUTES);
     }
     public void Bording() {
         // ボーダー処理
