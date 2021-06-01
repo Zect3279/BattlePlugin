@@ -2,9 +2,9 @@ package com.zect.battleplugin;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class GameController extends JavaPlugin {
+public class GameController extends JavaPlugin, Thread {
 
-    static void start(Server server, Scoreboard MainBoard, Map<String, String> TeamName, Location Corner, Map<String, Location> TeamRes, Integer timeLimit) {
+    public static void start(Server server, Scoreboard MainBoard, Map<String, String> TeamName, Location Corner, Map<String, Location> TeamRes, Integer timeLimit) {
         /* 引数
         * - [x] 戦闘チーム
         * - [x] 観覧チーム
@@ -27,7 +27,10 @@ public class GameController extends JavaPlugin {
         Location Spawn2 = TeamRes.get("Team2");
         
         // ゲーム開始機構
+        Count(server);
         
+    }
+    public static void Count(Server server) {
         /* titleでカウントダウン
         * 『ゲーム開始まで 5秒前』
         * 『3』
@@ -35,11 +38,23 @@ public class GameController extends JavaPlugin {
         * 『1』
         * 『ゲーム開始』
         */
-        
+    }
+    public static void Controll() {
         /*
         * ボーダー処理・殺害処理・勝敗判定
         * の関数を発火
         */
+        t1 = Bording();
     }
+    public void Bording() {
+        // ボーダー処理
+    }
+    public void KillCount() {
+        // 殺害処理
+    }
+    public void WinChecker() {
+        // 勝敗判定
+    }
+  
 
 }
