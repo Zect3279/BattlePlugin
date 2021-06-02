@@ -38,6 +38,9 @@ public final class BattlePlugin extends JavaPlugin {
                 .withSubcommand(new CommandAPICommand("check")
                         .executes(this::CheckSettings)
                 )
+                .withSubcommand(new CommandAPICommand("Teaming")
+                        .executes(this::GiveTeam)
+                )
                 .withSubcommand(new CommandAPICommand("FightTeam")
                         .withSubcommand(new CommandAPICommand("list")
                                 .executes(this::ShowFighters)
@@ -105,6 +108,12 @@ public final class BattlePlugin extends JavaPlugin {
     public Integer timeLimit = 300;
 
     
+    public void GiveTeam(CommandSender sender, Object[] args) {
+        // チームに所属させる
+        // チームカラーを取得して、その色で
+        // [0 - 0]
+        // みたいに表示する
+    }
     public void GameStart(CommandSender sender, Object[] args) {
         // ゲーム開始できるか判定する
 //         String checking = "ああ";
