@@ -1,23 +1,43 @@
 package com.zect.battleplugin;
 
+import org.bukkit.Location;
+import org.bukkit.Server;
+import org.bukkit.entity.Player;
+import org.bukkit.event.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.player.*;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class GameController extends JavaPlugin implements Listener {
-    
+
     public boolean GamePlaying = false;
 
-    public static void start(Server server, Scoreboard MainBoard, Map<String, String> TeamName, Location Corner, Map<String, Location> TeamRes, Integer timeLimit) {
+    public class NowPlaying {
+        public boolean getOnBoard() {
+            return GamePlaying;
+        }
+    }
+
+
+    public static void start(Server server, Scoreboard MainBoard, Map<String, String> TeamName, ArrayList<Location> Corner, Map<String, Location> TeamRes, Integer timeLimit) {
         /* 引数
-        * - [x] 戦闘チーム
-        * - [x] 観覧チーム
-        * - [x] リス地
-        * - [x] 範囲
-        * - [x] 制限時間
-        * - [x] スコアボードobj
-        * - [x] サーバーobj
-        */
-        
+         * - [x] 戦闘チーム
+         * - [x] 観覧チーム
+         * - [x] リス地
+         * - [x] 範囲
+         * - [x] 制限時間
+         * - [x] スコアボードobj
+         * - [x] サーバーobj
+         */
+
         // 使うであろう変数を用意
 //         Server server = sender.getServer();
 //         Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
@@ -28,76 +48,48 @@ public class GameController extends JavaPlugin implements Listener {
         Location Corner2 = Corner.get(1);
         Location Spawn1 = TeamRes.get("Team1");
         Location Spawn2 = TeamRes.get("Team2");
-        
+
         // ゲーム開始機構
         Count(server);
-        
+
     }
+
     public static void Count(Server server) {
         /* titleでカウントダウン
-        * 『ゲーム開始まで 5秒前』
-        * 『3』
-        * 『2』
-        * 『1』
-        * 『ゲーム開始』
-        */
+         * 『ゲーム開始まで 5秒前』
+         * 『3』
+         * 『2』
+         * 『1』
+         * 『ゲーム開始』
+         */
     }
-    public static void Controll() throws Exception {
+
+    public void Controll() throws Exception {
         /*
-        * ボーダー処理・殺害処理・勝敗判定
-        * の関数を発火
-        */
+         * ボーダー処理・殺害処理・勝敗判定
+         * の関数を発火
+         */
         GamePlaying = true;
-        Integer num = 5;
-        ExecutorService exec = Executors.newCachedThreadPool();
-        while (num > 0) {
-            exec.submit(new Bording());
-            exec.submit(new WinChecker());
-        }
-    // プレイヤーが死んだらインスタントが呼び出される
-    @EventHandler
-    public void onPlayerDead (PlayerDeathEvent e) {
-        if (!GamePlaying) {
-            return;
-        }
-        if (e.getEntity() instanceof Player) {
-            // 死んだ人の処理
-        }
-
-        if (e.getEntity().getKiller() instanceof Player) {
-            // 殺した人の処理
-        }
-    }
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        // 攻城戦中に入ってくたら、攻城戦に強制参加
-        // チームに参加していなかったら、人数が少ない方のチームに入れる
-        // チームリス地に強制的にTPする
-        if (!GamePlaying) {
-            return;
-        }
-        /* 
-        * 『あなたは、[チーム名] に所属しました。』
-        * 『後5秒でリス地にTPします。』
-        * 『3』
-        * 『2』
-        * 『1』
-        * 『TP完了』
-        */
+//        Integer num = 5;
+//        ExecutorService exec = Executors.newCachedThreadPool();
+//        while (num > 0) {
+//            exec.submit(new Bording());
+//            exec.submit(new WinChecker());
+//        }
     }
 }
 
-public class Bording implements Runnable {
-
-    public void run() {
-        // ボーダー処理
-    }
-}
-public class WinChecker implements Runnable {
-
-    public void run() {
-        // 勝敗判定
-    }
-}
+//public class Bording implements Runnable {
+//
+//    public void run() {
+//        // ボーダー処理
+//    }
+//}
+//public class WinChecker implements Runnable {
+//
+//    public void run() {
+//        // 勝敗判定
+//    }
+//}
 
 

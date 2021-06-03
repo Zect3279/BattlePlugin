@@ -8,13 +8,16 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
+import com.zect.battleplugin.GameController;
 
-public final class BattlePlugin extends JavaPlugin {
+public final class BattlePlugin extends JavaPlugin implements Listener {
 
     @Override
     public void onLoad() {
@@ -87,6 +90,7 @@ public final class BattlePlugin extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         // おまじない
+        getServer().getPluginManager().registerEvents(new GameController(), this);
         CommandAPI.onEnable(this);
     }
 
@@ -117,11 +121,11 @@ public final class BattlePlugin extends JavaPlugin {
     public void GameStart(CommandSender sender, Object[] args) {
         // ゲーム開始できるか判定する
 //         String checking = "ああ";
-       String checking = CheckCanPlay();
+        String checking = CheckCanPlay(sender);
         if (checking != null) {
             // ゲームが開始できない
             // 設定一覧を表示
-            BaseComponent[] check = SettingList();
+            List<BaseComponent[]> check = SettingList(sender);
             sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
                     + ChatColor.RED + check + "\nが設定できていないため、ゲームを開始できません。"
             );
@@ -142,7 +146,7 @@ public final class BattlePlugin extends JavaPlugin {
         */
         GameController.start(server, MainBoard, TeamName, Corner, TeamRes, timeLimit);
     }
-    public String CheckCanPlay() {
+    public String CheckCanPlay(CommandSender sender) {
         // ゲーム開始可能か確認する
         // 開始できなかったら、reasonを返す
         // ゲームが開始できるなら、nullを返す
@@ -162,19 +166,19 @@ public final class BattlePlugin extends JavaPlugin {
         Location Spawn1 = TeamRes.get("Team1");
         Location Spawn2 = TeamRes.get("Team2");
         
-        String cantStart;
+        String cantStart = null;
         
         // 開始条件のどれか一つでも無かったら、開始できない
         if (Team1 == null || Team2 == null || Corner1 == null || Corner2 == null || Spawn1 == null || Spawn2 == null) {
             // 上のどれかがnullだったら実行
             if (Team1 == null || Team2 == null) {
-                cantStart += "\n- 2つの戦闘チーム"
+                cantStart += "\n- 2つの戦闘チーム";
             }
             if (Corner1 == null || Corner2 == null) {
-                cantStart += "\n- 戦闘範囲の2つの角"
+                cantStart += "\n- 戦闘範囲の2つの角";
             }
             if (Spawn1 == null || Spawn2 == null) {
-                cantStart += "\n- 2つのスポーン地点"
+                cantStart += "\n- 2つのスポーン地点";
             }
         }
         return cantStart;
@@ -505,8 +509,8 @@ public final class BattlePlugin extends JavaPlugin {
         // チーム2のリス地へTP
         // ゲームスタートボタン
         BaseComponent[] starting;
-        BaseComponent[] check = SettingList();
-        String checking = CheckCanPlay();
+        List<BaseComponent[]> check = SettingList(sender);
+        String checking = CheckCanPlay(sender);
         if (checking == null) {
             starting = new ComponentBuilder(
                     new TextComponent(new ComponentBuilder()
@@ -514,16 +518,17 @@ public final class BattlePlugin extends JavaPlugin {
                             .create())
             )
                     .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                        .append("クリックで攻城戦を開始")
-                        .create()
+                            .append("クリックで攻城戦を開始")
+                            .create()
                     ))
                     .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/battle start"))
                     .create();
 //        }
 
-        sender.sendMessage(check + "\n\n" + starting);
+            sender.sendMessage(check + "\n\n" + starting);
+        }
     }
-    public BaseComponent[] SettingList() {
+    public List<BaseComponent[]> SettingList(CommandSender sender) {
         Server server = sender.getServer();
         Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
         Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
@@ -596,7 +601,7 @@ public final class BattlePlugin extends JavaPlugin {
                     .create();
         
         // 全部を結合
-        BaseComponent[] settigs = TeamList + TP1 + TP2 + TPCor1 + TPCor2
+        List<BaseComponent[]> settings = Arrays.asList(TeamList,TP1,TP2,TPCor1,TPCor2);
         
         return settings;
     }
