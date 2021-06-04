@@ -30,7 +30,8 @@ public class Event implements Listener {
         // 攻城戦中に入ってくたら、攻城戦に強制参加
         // チームに参加していなかったら、人数が少ない方のチームに入れる
         // チームリス地に強制的にTPする
-        if (!GameController.GamePlaying) {
+        boolean Now = GameController.GamePlaying;
+        if (!Now) {
             return;
         }
         /*
