@@ -41,9 +41,9 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 .withSubcommand(new CommandAPICommand("check")
                         .executes(this::CheckSettings)
                 )
-                .withSubcommand(new CommandAPICommand("Teaming")
-                        .executes(this::GiveTeam)
-                )
+//                 .withSubcommand(new CommandAPICommand("Teaming")
+//                         .executes(this::GiveTeam)
+//                 )
                 .withSubcommand(new CommandAPICommand("FightTeam")
                         .withSubcommand(new CommandAPICommand("list")
                                 .executes(this::ShowFighters)
@@ -112,7 +112,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     public Integer timeLimit = 300;
 
     
-    public void GiveTeam(CommandSender sender, Object[] args) {
+    public void GiveTeam(CommandSender sender) {
         // チームに所属させる
         // チームカラーを取得して、その色で
         // [0 - 0]
@@ -135,6 +135,14 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         
         Server server = sender.getServer();
         Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
+        
+        /* titleで表示
+        * 『チーム分けを実行...』
+        */
+        // チーム割当
+        GiveTeam(sender);
+        
+        
         /* 引数
         * - [x] 戦闘チーム
         * - [x] 観覧チーム
