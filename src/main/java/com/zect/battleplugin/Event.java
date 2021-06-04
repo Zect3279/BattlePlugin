@@ -13,7 +13,7 @@ public class Event implements Listener {
     // プレイヤーが死んだらインスタントが呼び出される
     @EventHandler
     public void onPlayerDead(PlayerDeathEvent event) {
-        boolean Now = GameController.NowPlaying.getOnBoard();
+        boolean Now = GameController.GamePlaying;
         if (!Now) {
             return;
         }
