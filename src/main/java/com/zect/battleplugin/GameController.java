@@ -51,7 +51,8 @@ public class GameController extends JavaPlugin implements Listener {
 
         // ゲーム開始機構
         Count(server);
-
+        // ゲーム開始
+//         Controll();
     }
 
     public static void Count(Server server) {
