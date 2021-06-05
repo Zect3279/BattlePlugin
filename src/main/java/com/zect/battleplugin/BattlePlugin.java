@@ -121,13 +121,11 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     public void GameStart(CommandSender sender, Object[] args) {
         // ゲーム開始できるか判定する
 //         String checking = "ああ";
-        String checking = CheckCanPlay(sender);
+        String checking = CheckCanPlay();
         if (checking != null) {
             // ゲームが開始できない
-            // 設定一覧を表示
-            List<BaseComponent[]> check = SettingList(sender);
             sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + check + "\nが設定できていないため、ゲームを開始できません。"
+                    + ChatColor.RED + checking + "\nが設定できていないため、ゲームを開始できません。"
             );
 
         }
@@ -154,7 +152,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         */
         GameController.start(server, MainBoard, TeamName, Corner, TeamRes, timeLimit);
     }
-    public String CheckCanPlay(CommandSender sender) {
+    public String CheckCanPlay() {
         // ゲーム開始可能か確認する
         // 開始できなかったら、reasonを返す
         // ゲームが開始できるなら、nullを返す
@@ -164,25 +162,21 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         *  - 範囲指定用の角が２つある
         *  - スポーン/リスポーン地点が２つ設定されてる
         */
-        
-        Server server = sender.getServer();
-        Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
-        Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
-        Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
-        Location Corner1 = Corner.get(0);
-        Location Corner2 = Corner.get(1);
+
+        String Team1 = TeamName.get("Team1");
+        String Team2 = TeamName.get("Team2");
         Location Spawn1 = TeamRes.get("Team1");
         Location Spawn2 = TeamRes.get("Team2");
         
-        String cantStart = null;
+        String cantStart = "";
         
         // 開始条件のどれか一つでも無かったら、開始できない
-        if (Team1 == null || Team2 == null || Corner1 == null || Corner2 == null || Spawn1 == null || Spawn2 == null) {
+        if (Team1 == null || Team2 == null || Corner.size() < 2 || Spawn1 == null || Spawn2 == null) {
             // 上のどれかがnullだったら実行
             if (Team1 == null || Team2 == null) {
                 cantStart += "\n- 2つの戦闘チーム";
             }
-            if (Corner1 == null || Corner2 == null) {
+            if (Corner.size() < 2) {
                 cantStart += "\n- 戦闘範囲の2つの角";
             }
             if (Spawn1 == null || Spawn2 == null) {
@@ -207,9 +201,6 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         // 角を追加
         Location corner = (Location) args[0];
 
-        Location Corner1 = Corner.get(0);
-        Location Corner2 = Corner.get(1);
-
         Integer x = corner.getBlockX();
         Integer y = corner.getBlockY();
         Integer z = corner.getBlockZ();
@@ -227,30 +218,49 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + x + " " + y + " " + z))
                 .create();
 
-        if (corner == Corner1 || corner == Corner2) {
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + "この座標は既に登録されています。\n"
-                    + "座標を確認して、再度実行してください。"
-            );
-        } else if (Corner.size() < 3) {
-            Corner.add(corner);
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.GREEN + "範囲の角を一つ指定しました。\n"
-                    + "以下のブロックからTPできます。"
-            );
-            sender.sendMessage(TP);
-        } else if (Corner.size() > 2){
-            Corner.remove(0);
-            Corner.add(corner);
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.GREEN + "範囲の角を一つ指定しました。\n"
-                    + "以下のブロックからTPできます。"
-            );
-            sender.sendMessage(TP);
-        } else {
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + "エラーが発生しました。\n入力したコマンドを確認して、もう一度試してください。"
-            );
+        switch (Corner.size()) {
+            case 0:
+                Corner.add(corner);
+                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                        + ChatColor.GREEN + "範囲の角を一つ指定しました。\n"
+                        + "以下のブロックからTPできます。"
+                );
+                sender.sendMessage(TP);
+                return;
+            case 1:
+                if (Corner.get(0) == corner) {
+                    sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                            + ChatColor.RED + "この座標は既に登録されています。\n"
+                            + "座標を確認して、再度実行してください。"
+                    );
+                } else {
+                    Corner.add(corner);
+                    sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                            + ChatColor.GREEN + "範囲の角を一つ指定しました。\n"
+                            + "以下のブロックからTPできます。"
+                    );
+                    sender.sendMessage(TP);
+                }
+                return;
+            case 2:
+                if (Corner.get(0) == corner || Corner.get(1) == corner) {
+                    sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                            + ChatColor.RED + "この座標は既に登録されています。\n"
+                            + "座標を確認して、再度実行してください。"
+                    );
+                } else {
+                    Corner.add(corner);
+                    sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                            + ChatColor.GREEN + "範囲の角を一つ指定しました。\n"
+                            + "以下のブロックからTPできます。"
+                    );
+                    sender.sendMessage(TP);
+                }
+                return;
+            default:
+                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                        + ChatColor.RED + "エラーが発生しました。\n入力したコマンドを確認して、もう一度試してください。"
+                );
         }
     }
     public void AddFighters(CommandSender sender, Object[] args) {
@@ -518,7 +528,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         // ゲームスタートボタン
         BaseComponent[] starting;
         List<BaseComponent[]> check = SettingList(sender);
-        String checking = CheckCanPlay(sender);
+        String checking = CheckCanPlay();
         if (checking == null) {
             starting = new ComponentBuilder(
                     new TextComponent(new ComponentBuilder()
@@ -533,15 +543,19 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                     .create();
 //        }
 
-            sender.sendMessage(check + "\n\n" + starting);
+            for (int i = 0; i >= check.size(); i++){
+                sender.sendMessage(check.get(i));
+            }
+            sender.sendMessage("\n\n");
+            sender.sendMessage(starting);
         }
     }
     public List<BaseComponent[]> SettingList(CommandSender sender) {
         Server server = sender.getServer();
         Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
-        Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
-        Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
-        Team Team3 = MainBoard.getTeam(TeamName.get("Team3"));
+        String Team1 = TeamName.get("Team1");
+        String Team2 = TeamName.get("Team2");
+        String Team3 = TeamName.get("Team3");
         Location Corner1 = Corner.get(0);
         Location Corner2 = Corner.get(1);
         Location Spawn1 = TeamRes.get("Team1");
@@ -609,9 +623,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                     .create();
         
         // 全部を結合
-        List<BaseComponent[]> settings = Arrays.asList(TeamList,TP1,TP2,TPCor1,TPCor2);
-        
-        return settings;
+
+        return Arrays.asList(TeamList,TP1,TP2,TPCor1,TPCor2);
     }
 
 }

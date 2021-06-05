@@ -18,13 +18,8 @@ import java.util.concurrent.Executors;
 
 public class GameController extends JavaPlugin implements Listener {
 
-    public boolean GamePlaying = false;
+    public static boolean GamePlaying = false;
 
-    public class NowPlaying {
-        public boolean getOnBoard() {
-            return GamePlaying;
-        }
-    }
 
 
     public static void start(Server server, Scoreboard MainBoard, Map<String, String> TeamName, ArrayList<Location> Corner, Map<String, Location> TeamRes, Integer timeLimit) {
