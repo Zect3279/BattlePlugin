@@ -15,7 +15,6 @@ import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
-import com.zect.battleplugin.GameController;
 
 public final class BattlePlugin extends JavaPlugin implements Listener {
 
@@ -90,7 +89,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     public void onEnable() {
         // Plugin startup logic
         // おまじない
-        getServer().getPluginManager().registerEvents(new GameController(), this);
+        getServer().getPluginManager().registerEvents(new EventListener(), this);
         CommandAPI.onEnable(this);
     }
 
@@ -111,13 +110,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     // デフォルトの秒数を300秒に
     public Integer timeLimit = 300;
 
-    
-    public void GiveTeam(CommandSender sender) {
-        // チームに所属させる
-        // チームカラーを取得して、その色で
-        // [0 - 0]
-        // みたいに表示する
-    }
+
     public void GameStart(CommandSender sender, Object[] args) {
         // ゲーム開始できるか判定する
 //         String checking = "ああ";
@@ -130,6 +123,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
         }
         // ゲーム開始
+        sender.sendMessage("ゲームを開始");
         
         Server server = sender.getServer();
         Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
@@ -152,6 +146,13 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         */
         GameController.start(server, MainBoard, TeamName, Corner, TeamRes, timeLimit);
     }
+    public void GiveTeam(CommandSender sender) {
+        // チームに所属させる
+        // チームカラーを取得して、その色で
+        // [0 - 0]
+        // みたいに表示する
+        sender.sendMessage("チーム分けを開始");
+    }
     public String CheckCanPlay() {
         // ゲーム開始可能か確認する
         // 開始できなかったら、reasonを返す
@@ -169,21 +170,29 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         Location Spawn2 = TeamRes.get("Team2");
         
         String cantStart = "";
+        Integer can = 0;
         
         // 開始条件のどれか一つでも無かったら、開始できない
         if (Team1 == null || Team2 == null || Corner.size() < 2 || Spawn1 == null || Spawn2 == null) {
             // 上のどれかがnullだったら実行
             if (Team1 == null || Team2 == null) {
                 cantStart += "\n- 2つの戦闘チーム";
+                can += 1;
             }
             if (Corner.size() < 2) {
                 cantStart += "\n- 戦闘範囲の2つの角";
+                can += 1;
             }
             if (Spawn1 == null || Spawn2 == null) {
                 cantStart += "\n- 2つのスポーン地点";
+                can += 1;
             }
         }
-        return cantStart;
+        if (can == 0) {
+            return null;
+        } else {
+            return cantStart;
+        }
     }
     public void SetTimeLimit(CommandSender sender, Object[] args) {
         // 時間制限を追加
@@ -539,9 +548,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                             .append("クリックで攻城戦を開始")
                             .create()
                     ))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/battle start"))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/siege start"))
                     .create();
-//        }
 
             for (int i = 0; i >= check.size(); i++){
                 sender.sendMessage(check.get(i));
@@ -568,59 +576,60 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         + "\n- 戦闘チーム2 : " + Team2
                         + "\n- 観覧チーム : " + Team3
                     ).color(ChatColor.GREEN)
-                    .create())
-            ).create();
-            // 設定したリスポーン地点の座標をx,y,zに保存
-            String cor1 = Corner1.getBlockX() + " " + Corner1.getBlockY() + " " + Corner1.getBlockZ();
-            String cor2 = Corner2.getBlockX() + " " + Corner2.getBlockY() + " " + Corner2.getBlockZ();
-            String spa1 = Spawn1.getBlockX() + " " + Spawn1.getBlockY() + " " + Spawn1.getBlockZ();
-            String spa2 = Spawn2.getBlockX() + " " + Spawn2.getBlockY() + " " + Spawn2.getBlockZ();
+                    .create()
+                )
+        ).create();
+        // 設定したリスポーン地点の座標をx,y,zに保存
+        String cor1 = Corner1.getBlockX() + " " + Corner1.getBlockY() + " " + Corner1.getBlockZ();
+        String cor2 = Corner2.getBlockX() + " " + Corner2.getBlockY() + " " + Corner2.getBlockZ();
+        String spa1 = Spawn1.getBlockX() + " " + Spawn1.getBlockY() + " " + Spawn1.getBlockZ();
+        String spa2 = Spawn2.getBlockX() + " " + Spawn2.getBlockY() + " " + Spawn2.getBlockZ();
 
-            // クリックしたらTPする不思議なブロックを生成
-            BaseComponent[] TP1 = new ComponentBuilder(
-                    new TextComponent(new ComponentBuilder()
-                            .append("\n- チーム1のリス地 : " + spa1).color(ChatColor.GREEN)
-                            .create())
-            )
-                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                            .append("クリックでチーム1のリス地へTP")
-                            .create()
-                    ))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + spa1))
-                    .create();
-            BaseComponent[] TP2 = new ComponentBuilder(
-                    new TextComponent(new ComponentBuilder()
-                            .append("\n- チーム2のリス地 : " + spa2).color(ChatColor.GREEN)
-                            .create())
-            )
-                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                            .append("クリックでチーム2のリス地へTP")
-                            .create()
-                    ))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + spa2))
-                    .create();
-            BaseComponent[] TPCor1 = new ComponentBuilder(
-                    new TextComponent(new ComponentBuilder()
-                            .append("\n- 戦闘範囲の角1 : " + cor1).color(ChatColor.GREEN)
-                            .create())
-            )
-                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                            .append("クリックで角1にTP")
-                            .create()
-                    ))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + cor1))
-                    .create();
-            BaseComponent[] TPCor2 = new ComponentBuilder(
-                    new TextComponent(new ComponentBuilder()
-                            .append("\n- 戦闘範囲の角2 : " + cor2).color(ChatColor.GREEN)
-                            .create())
-            )
-                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                            .append("クリックで角2にTP")
-                            .create()
-                    ))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + cor2))
-                    .create();
+        // クリックしたらTPする不思議なブロックを生成
+        BaseComponent[] TP1 = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                        .append("\n- チーム1のリス地 : " + spa1).color(ChatColor.GREEN)
+                        .create())
+        )
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                        .append("クリックでチーム1のリス地へTP")
+                        .create()
+                ))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + spa1))
+                .create();
+        BaseComponent[] TP2 = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                        .append("\n- チーム2のリス地 : " + spa2).color(ChatColor.GREEN)
+                        .create())
+        )
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                        .append("クリックでチーム2のリス地へTP")
+                        .create()
+                ))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + spa2))
+                .create();
+        BaseComponent[] TPCor1 = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                        .append("\n- 戦闘範囲の角1 : " + cor1).color(ChatColor.GREEN)
+                        .create())
+        )
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                        .append("クリックで角1にTP")
+                        .create()
+                ))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + cor1))
+                .create();
+        BaseComponent[] TPCor2 = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                        .append("\n- 戦闘範囲の角2 : " + cor2).color(ChatColor.GREEN)
+                        .create())
+        )
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                        .append("クリックで角2にTP")
+                        .create()
+                ))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + cor2))
+                .create();
         
         // 全部を結合
 
