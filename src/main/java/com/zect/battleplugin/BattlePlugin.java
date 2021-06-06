@@ -32,6 +32,11 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             Bukkit.getScoreboardManager().getMainScoreboard().getTeams().toArray(new Team[0]))
         );
 
+        // ゲームルールのアーギュメントリスト
+        List<Argument> gameruleArgument = new ArrayList<>();
+        String[] ruleList = new String[] {"survival", "simple"};
+        gameruleArgument.add(new StringArgument("Rule").overrideSuggestions(ruleList));
+
         // コマンドを設定する
         new CommandAPICommand("siege")
                 .withSubcommand(new CommandAPICommand("start")
@@ -43,6 +48,10 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 //                 .withSubcommand(new CommandAPICommand("Teaming")
 //                         .executes(this::GiveTeam)
 //                 )
+                .withSubcommand(new CommandAPICommand("GameRule")
+                        .withArguments(gameruleArgument)
+                        .executes(this::SetGameRule)
+                )
                 .withSubcommand(new CommandAPICommand("FightTeam")
                         .withSubcommand(new CommandAPICommand("list")
                                 .executes(this::ShowFighters)
@@ -111,6 +120,21 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     public Integer timeLimit = 300;
 
 
+    public void SetGameRule(CommandSender sender, Object[] args) {
+        String rule = (String) args[0];
+        sender.sendMessage(rule);
+        switch (rule) {
+            case "survival":
+                sender.sendMessage("サバイバル攻城戦");
+                break;
+            case "simple":
+                sender.sendMessage("シンプル攻城戦");
+                break;
+            default:
+                sender.sendMessage("エラーが発生");
+                break;
+        }
+    }
     public void GameStart(CommandSender sender, Object[] args) {
         // ゲーム開始できるか判定する
 //         String checking = "ああ";

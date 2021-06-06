@@ -3,18 +3,13 @@ package com.zect.battleplugin;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.*;
-import org.bukkit.event.player.*;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class GameController extends JavaPlugin implements Listener {
 
@@ -58,6 +53,9 @@ public class GameController extends JavaPlugin implements Listener {
          * 『1』
          * 『ゲーム開始』
          */
+        for (Player player : server.getOnlinePlayers()) {
+            player.sendMessage("ゲーム開始");
+        }
     }
 
     public void Controll() throws Exception {
