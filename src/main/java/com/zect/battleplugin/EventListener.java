@@ -5,10 +5,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
-import com.zect.battleplugin.GameController;
-
-public class Event implements Listener {
+public class EventListener implements Listener {
 
     // プレイヤーが死んだらインスタントが呼び出される
     @EventHandler
@@ -42,5 +41,10 @@ public class Event implements Listener {
          * 『1』
          * 『TP完了』
          */
+    }
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        Player player = event.getPlayer();
+        player.sendMessage("hello");
     }
 }
