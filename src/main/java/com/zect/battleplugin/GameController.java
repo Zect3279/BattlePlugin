@@ -1,10 +1,12 @@
 package com.zect.battleplugin;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
@@ -46,6 +48,7 @@ public class GameController extends JavaPlugin implements Listener {
     }
 
     public static void Count(Server server) {
+        Collection<Player> players = (Collection<Player>) Bukkit.getOnlinePlayers();
         /* titleでカウントダウン
          * 『ゲーム開始まで 5秒前』
          * 『3』
@@ -53,9 +56,35 @@ public class GameController extends JavaPlugin implements Listener {
          * 『1』
          * 『ゲーム開始』
          */
-        for (Player player : server.getOnlinePlayers()) {
-            player.sendMessage("ゲーム開始");
+        try {
+            Util.setTitle("開始まで 5秒前", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 4秒", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 3秒", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 2秒", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 1秒", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("ゲーム開始！", "50人マイクラ戦争", 30);
+            Util.sendSound(players, Sound.BLOCK_ANVIL_PLACE);
+
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
     }
 
     public void Controll() throws Exception {

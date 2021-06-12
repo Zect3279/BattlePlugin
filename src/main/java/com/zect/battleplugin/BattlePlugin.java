@@ -7,7 +7,9 @@ import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
@@ -44,6 +46,9 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 )
                 .withSubcommand(new CommandAPICommand("check")
                         .executes(this::CheckSettings)
+                )
+                .withSubcommand(new CommandAPICommand("simoru")
+                        .executes(this::Simota)
                 )
 //                 .withSubcommand(new CommandAPICommand("Teaming")
 //                         .executes(this::GiveTeam)
@@ -92,6 +97,19 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .executes(this::SetTimeLimit)
                 )
                 .register();
+
+
+        new CommandAPICommand("test")
+                .withSubcommand(new CommandAPICommand("count")
+                        .executes(this::toCount)
+                )
+                .register();
+
+    }
+
+    private void toCount(CommandSender sender, Object[] args) {
+        Server server = sender.getServer();
+        GameController.Count(server);
     }
 
     @Override
@@ -169,6 +187,53 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         * - [x] サーバーobj
         */
         GameController.start(server, MainBoard, TeamName, Corner, TeamRes, timeLimit);
+    }
+
+    public void Simota(CommandSender sender, Object[] args) {
+        Server server = sender.getServer();
+        GameController.Count(server);
+        Collection<Player> players = (Collection<Player>) Bukkit.getOnlinePlayers();
+        /* titleでカウントダウン
+         * 『ゲーム開始まで 5秒前』
+         * 『3』
+         * 『2』
+         * 『1』
+         * 『ゲーム開始』
+         */
+        try {
+            Util.setTitle("開始まで 5秒前", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 4秒", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 3秒", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 2秒", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 1秒", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("ゲーム開始！", "50人マイクラ戦争", 30);
+            Util.sendSound(players, Sound.BLOCK_ANVIL_PLACE);
+
+            Thread.sleep(700);
+            Util.setTitle("____チームの勝利", "ゲーム終了", 150);
+            for(Player player : players) {
+                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE,0.1f,1);
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
     public void GiveTeam(CommandSender sender) {
         // チームに所属させる
