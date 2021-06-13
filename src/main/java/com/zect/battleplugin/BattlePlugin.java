@@ -179,12 +179,9 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         
         Server server = sender.getServer();
         Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
-        
-        /* titleで表示
-        * 『チーム分けを実行...』
-        */
+
         // チーム割当
-//        GiveTeam(sender);
+        GiveTeam(sender, args);
         
         /* 引数
         * - [x] 戦闘チーム
@@ -273,7 +270,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             Collection<? extends Player> players = server.getOnlinePlayers();
 
             for (Player player : players) {
-                Integer num = random.nextInt(1);
+                Integer num = random.nextInt(2);
                 Team team = score.getPlayerTeam(player);
                 if (team == null) {
                     if (num == 0) {
@@ -288,12 +285,21 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         return;
                     } else if (Team1 == null || Team2 == null) {
                         return;
-                    } else if (num == 0) {
-                        team1.addPlayer(player);
-                    } else if (num == 1) {
-                        team2.addPlayer(player);
                     } else {
-                        return;
+                        if (team.getName() == TeamName.get("Team1")) {
+                            team1.removePlayer(player);
+                        }
+                        if (team.getName() == TeamName.get("Team2")) {
+                            team2.removePlayer(player);
+                        }
+
+                        if (num == 0) {
+                            team1.addPlayer(player);
+                        } else if (num == 1) {
+                            team2.addPlayer(player);
+                        } else {
+                            return;
+                        }
                     }
                 }
                 size1 = String.valueOf(team1.getSize());
