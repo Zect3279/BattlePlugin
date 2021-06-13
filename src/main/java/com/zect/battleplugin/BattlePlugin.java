@@ -250,40 +250,62 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         // チームカラーを取得して、その色で
         // [0 - 0]
         // みたいに表示する
-        Util.setTitle("チーム分けを実行", "マイクラ戦争", 100);
         Server server = sender.getServer();
-        Collection<? extends Player> players = server.getOnlinePlayers();
         Scoreboard score = server.getScoreboardManager().getMainScoreboard();
         String Team1 = TeamName.get("Team1");
         String Team2 = TeamName.get("Team2");
-        for (Player player : players) {
-            Integer num = random.nextInt(1);
-            Team team = score.getPlayerTeam(player);
-            if (team == null) {
-                if (num == 0) {
-                    Team team1 = score.getTeam(TeamName.get("Team1"));
-                    team1.addPlayer(player);
-                } else if (num == 1) {
-                    Team team2 = score.getTeam(TeamName.get("Team2"));
-                    team2.addPlayer(player);
+
+        String size1 = "0";
+        String size2 = "0";
+
+
+        if (score.getTeam(Team1) == null || score.getTeam(Team2) == null) {
+            return;
+        }
+
+        try {
+            Util.setTitle(size1 + " - " + size2, "チーム分けを開始", 100);
+
+            Thread.sleep(200);
+
+            Team team1 = score.getTeam(TeamName.get("Team1"));
+            Team team2 = score.getTeam(TeamName.get("Team2"));
+            Collection<? extends Player> players = server.getOnlinePlayers();
+
+            for (Player player : players) {
+                Integer num = random.nextInt(1);
+                Team team = score.getPlayerTeam(player);
+                if (team == null) {
+                    if (num == 0) {
+                        team1.addPlayer(player);
+                    } else if (num == 1) {
+                        team2.addPlayer(player);
+                    } else {
+                        return;
+                    }
                 } else {
-                    return;
+                    if (team.getName() == TeamName.get("Team1") || team.getName() == TeamName.get("Team2") || team.getName() == TeamName.get("Team3")) {
+                        return;
+                    } else if (Team1 == null || Team2 == null) {
+                        return;
+                    } else if (num == 0) {
+                        team1.addPlayer(player);
+                    } else if (num == 1) {
+                        team2.addPlayer(player);
+                    } else {
+                        return;
+                    }
                 }
-            } else {
-                if (team.getName() == TeamName.get("Team1") || team.getName() == TeamName.get("Team2") || team.getName() == TeamName.get("Team3")) {
-                    player.sendMessage("もうチームに所属してるよ");
-                } else if (Team1 == null || Team2 == null) {
-                    return;
-                } else if (num == 0) {
-                    Team team1 = score.getTeam(TeamName.get("Team1"));
-                    team1.addPlayer(player);
-                } else if (num == 1) {
-                    Team team2 = score.getTeam(TeamName.get("Team2"));
-                    team2.addPlayer(player);
-                } else {
-                    return;
-                }
+                size1 = String.valueOf(team1.getSize());
+                size2 = String.valueOf(team2.getSize());
+                Util.setTitle(team1.getColor() + size1 + ChatColor.WHITE + " - " + team2.getColor() + size2, "チーム分け中", 100);
             }
+            Thread.sleep(200);
+
+            Util.setTitle(team1.getColor() + size1 + ChatColor.WHITE + " - " + team2.getColor() + size2, "チーム分け完了", 100);
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
     public String CheckCanPlay() {
