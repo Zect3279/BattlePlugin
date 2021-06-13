@@ -41,6 +41,9 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
         // コマンドを設定する
         new CommandAPICommand("siege")
+                .withSubcommand(new CommandAPICommand("title")
+                        .executes(this::TitleCall)
+                )
                 .withSubcommand(new CommandAPICommand("start")
                         .executes(this::GameStart)
                 )
@@ -152,6 +155,9 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 sender.sendMessage("エラーが発生");
                 break;
         }
+    }
+    public void TitleCall(CommandSender sender, Object[] args) {
+        Util.setTitle("マイクラ戦争プラグイン", "企画:KUN(?) 制作:Zect 命名:nori", 500)
     }
     public void GameStart(CommandSender sender, Object[] args) {
         // ゲーム開始できるか判定する
