@@ -31,8 +31,6 @@ public class GameController extends JavaPlugin implements Listener {
          */
 
         // 使うであろう変数を用意
-//         Server server = sender.getServer();
-//         Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
 //        Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
 //        Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
 //        Team Team3 = MainBoard.getTeam(TeamName.get("Team3"));
@@ -49,13 +47,7 @@ public class GameController extends JavaPlugin implements Listener {
 
     public static void Count(Server server) {
         Collection<Player> players = (Collection<Player>) Bukkit.getOnlinePlayers();
-        /* titleでカウントダウン
-         * 『ゲーム開始まで 5秒前』
-         * 『3』
-         * 『2』
-         * 『1』
-         * 『ゲーム開始』
-         */
+        // titleでカウントダウン
         try {
             Util.setTitle("開始まで 5秒前", "マイクラ戦争が始まるよ", 100);
             Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);

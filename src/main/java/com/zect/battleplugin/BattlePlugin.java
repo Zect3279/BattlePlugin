@@ -1,6 +1,7 @@
 package com.zect.battleplugin;
 
-import dev.jorel.commandapi.*;
+import dev.jorel.commandapi.CommandAPI;
+import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
@@ -106,6 +107,9 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 .withSubcommand(new CommandAPICommand("count")
                         .executes(this::toCount)
                 )
+                .withSubcommand(new CommandAPICommand("team")
+                        .executes(this::GiveTeam)
+                )
                 .register();
 
     }
@@ -157,7 +161,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         }
     }
     public void TitleCall(CommandSender sender, Object[] args) {
-        Util.setTitle("マイクラ戦争プラグイン", "企画:KUN(?) 制作:Zect 命名:nori", 500)
+        Util.setTitle("マイクラ戦争プラグイン", "企画:KUN(?) 制作:Zect 命名:nori", 500);
     }
     public void GameStart(CommandSender sender, Object[] args) {
         // ゲーム開始できるか判定する
@@ -180,8 +184,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         * 『チーム分けを実行...』
         */
         // チーム割当
-        GiveTeam(sender);
-        
+//        GiveTeam(sender);
         
         /* 引数
         * - [x] 戦闘チーム
@@ -227,7 +230,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTitle("ゲーム開始！", "50人マイクラ戦争", 30);
+            Util.setTitle("ゲーム開始！", "50人マイクラ戦争", 100);
             Util.sendSound(players, Sound.BLOCK_ANVIL_PLACE);
 
             Thread.sleep(700);
@@ -241,12 +244,47 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         }
 
     }
-    public void GiveTeam(CommandSender sender) {
+    public void GiveTeam(CommandSender sender, Object[] args) {
+        Random random = new Random();
         // チームに所属させる
         // チームカラーを取得して、その色で
         // [0 - 0]
         // みたいに表示する
-        sender.sendMessage("チーム分けを開始");
+        Util.setTitle("チーム分けを実行", "マイクラ戦争", 100);
+        Server server = sender.getServer();
+        Collection<? extends Player> players = server.getOnlinePlayers();
+        Scoreboard score = server.getScoreboardManager().getMainScoreboard();
+        String Team1 = TeamName.get("Team1");
+        String Team2 = TeamName.get("Team2");
+        for (Player player : players) {
+            Integer num = random.nextInt(1);
+            Team team = score.getPlayerTeam(player);
+            if (team == null) {
+                if (num == 0) {
+                    Team team1 = score.getTeam(TeamName.get("Team1"));
+                    team1.addPlayer(player);
+                } else if (num == 1) {
+                    Team team2 = score.getTeam(TeamName.get("Team2"));
+                    team2.addPlayer(player);
+                } else {
+                    return;
+                }
+            } else {
+                if (team.getName() == TeamName.get("Team1") || team.getName() == TeamName.get("Team2") || team.getName() == TeamName.get("Team3")) {
+                    player.sendMessage("もうチームに所属してるよ");
+                } else if (Team1 == null || Team2 == null) {
+                    return;
+                } else if (num == 0) {
+                    Team team1 = score.getTeam(TeamName.get("Team1"));
+                    team1.addPlayer(player);
+                } else if (num == 1) {
+                    Team team2 = score.getTeam(TeamName.get("Team2"));
+                    team2.addPlayer(player);
+                } else {
+                    return;
+                }
+            }
+        }
     }
     public String CheckCanPlay() {
         // ゲーム開始可能か確認する
