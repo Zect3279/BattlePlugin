@@ -205,15 +205,12 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         */
         switch (gameType) {
             case "survival":
-                GameController.SurvivalStart(server, MainBoard, TeamName, TeamRes, Beacon);
-                gameType = "survival";
+                GameController.SurvivalStart(server, MainBoard, TeamName, TeamRes, Beacon, ticketLimit);
                 break;
             case "king":
                 GameController.KingStart(server, MainBoard, TeamName, TeamRes, King);
-                gameType = "king";
             case "simple":
-                sender.sendMessage("シンプル戦\n・時間制限有り\n・大将を殺して終了");
-                gameType = "simple";
+                GameController.SimpleStart(server, MainBoard, TeamName, TeamRes, King, timeLimit);
             default:
                 sender.sendMessage("エラーが発生");
                 break;
@@ -226,7 +223,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         // みたいに表示する
         Random random = new Random();
         // チーム作成
-        AddTeams(sender);
+        MakeTeams(sender);
 
         Server server = sender.getServer();
         Scoreboard score = server.getScoreboardManager().getMainScoreboard();
@@ -290,7 +287,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             e.printStackTrace();
         }
     }
-    public void AddTeams(CommandSender sender) {
+    public void MakeTeams(CommandSender sender) {
         // チームを作成・登録
 
         // コマンド入力時に取得したチーム名からチームオブジェクトを持ってくる
@@ -322,26 +319,39 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         *  - 範囲指定用の角が２つある
         *  - スポーン/リスポーン地点が２つ設定されてる
         */
-
-        String Team1 = TeamName.get("Team1");
-        String Team2 = TeamName.get("Team2");
-        Location Spawn1 = TeamRes.get("Team1");
-        Location Spawn2 = TeamRes.get("Team2");
-        
         String cantStart = "";
         Integer can = 0;
         
         // 開始条件のどれか一つでも無かったら、開始できない
-        if (Team1 == null || Team2 == null || Spawn1 == null || Spawn2 == null) {
-            // 上のどれかがnullだったら実行
-            if (Team1 == null || Team2 == null) {
-                cantStart += "\n- 2つの戦闘チーム";
-                can += 1;
-            }
-            if (Spawn1 == null || Spawn2 == null) {
-                cantStart += "\n- 2つのスポーン地点";
-                can += 1;
-            }
+        switch (gameType) {
+            case "survival":
+//                sender.sendMessage("サバイバル戦\n・時間制限なし\n・チケット0で終了\n・ビーコン有り");
+                if (Beacon.get("Team1") == null || Beacon.get("Team2") == null) {
+                    cantStart += "\n- ビーコンの場所が指定されてない";
+                    can += 1;
+                }
+                if (TeamRes.get("Team1") == null || TeamRes.get("Team2") == null) {
+                    cantStart += "\n- リスポーン地点が指定されていない";
+                    can += 1;
+                }
+
+                break;
+            case "king":
+            case "simple":
+//                sender.sendMessage("大将戦\n・時間制限なし\n・大将を殺して終了");
+//                sender.sendMessage("シンプル戦\n・時間制限有り\n・大将を殺して終了");
+                if (King.get("Team1") == null || King.get("Team2") == null) {
+                    cantStart += "\n- 大将が指定できてない";
+                    can += 1;
+                }
+                if (TeamRes.get("Team1") == null || TeamRes.get("Team2") == null) {
+                    cantStart += "\n- リスポーン地点が指定されていない";
+                    can += 1;
+                }
+
+                break;
+            default:
+                break;
         }
         if (can == 0) {
             return null;
@@ -359,22 +369,6 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 + ChatColor.GREEN + "から"
                 + ChatColor.YELLOW + "[" + timeLimit + "]\n"
                 + ChatColor.GREEN + "に設定しました。"
-        );
-    }
-    public void ShowFighters(CommandSender sender, Object[] args) {
-        // チーム一覧を表示
-        // 設定されてなかったら、nullが返る
-        sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]"
-                + ChatColor.GREEN
-                + "\n戦闘チーム1 : " + TeamName.get("Team1")
-                + "\n戦闘チーム2 : " + TeamName.get("Team2")
-        );
-    }
-    public void ShowWatchers(CommandSender sender, Object[] args) {
-        // 観覧チームを表示
-        sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]"
-                + ChatColor.GREEN
-                + "\n観覧チーム : " + TeamName.get("Team3")
         );
     }
     public void SpawnPoint(CommandSender sender, Object[] args) {
@@ -520,11 +514,43 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         // チーム1のリス地へTP
         // チーム2のリス地へTP
         // ゲームスタートボタン
-        BaseComponent[] starting;
-        List<BaseComponent[]> check = SettingList(sender);
-        String checking = CheckCanPlay();
-        if (checking == null) {
-            starting = new ComponentBuilder(
+        Integer cannot = 0;
+        switch (gameType) {
+            case "survival":
+//                sender.sendMessage("サバイバル戦\n・時間制限なし\n・チケット0で終了\n・ビーコン有り");
+                if (Beacon.get("Team1") == null || Beacon.get("Team2") == null) {
+                    sender.sendMessage("ビーコンの場所が指定されてない");
+                    cannot += 1;
+                }
+                if (TeamRes.get("Team1") == null || TeamRes.get("Team2") == null) {
+                    sender.sendMessage("リスポーン地点が指定されていない");
+                    cannot += 1;
+                }
+
+                break;
+            case "king":
+            case "simple":
+//                sender.sendMessage("大将戦\n・時間制限なし\n・大将を殺して終了");
+//                sender.sendMessage("シンプル戦\n・時間制限有り\n・大将を殺して終了");
+                if (King.get("Team1") == null || King.get("Team2") == null) {
+                    sender.sendMessage("大将が指定できてない");
+                    cannot += 1;
+                }
+                if (TeamRes.get("Team1") == null || TeamRes.get("Team2") == null) {
+                    sender.sendMessage("リスポーン地点が指定されていない");
+                    cannot += 1;
+                }
+
+                break;
+            default:
+                sender.sendMessage("ゲームモードが指定されていません。\n'/siege GameRule <type>' で指定してください。");
+                break;
+        }
+        if (cannot != 0) {
+            return;
+        } else {
+            // ゲーム開始ボタンを作成
+            BaseComponent[] starting = new ComponentBuilder(
                     new TextComponent(new ComponentBuilder()
                             .append("[クリックで対戦を開始]").color(ChatColor.GOLD)
                             .create())
@@ -535,42 +561,60 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                     ))
                     .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/siege start"))
                     .create();
-
-            for (int i = 0; i >= check.size(); i++){
-                sender.sendMessage(check.get(i));
-            }
-            sender.sendMessage("\n\n");
             sender.sendMessage(starting);
         }
+
+        String checking = CheckCanPlay();
+        if (checking == "") {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]");
+            sender.sendMessage(GetTeam(sender));
+            sender.sendMessage(GetRes1(sender));
+            sender.sendMessage(GetRes2(sender));
+            switch (gameType) {
+                case "survival":
+                    sender.sendMessage(GetBea1(sender));
+                    sender.sendMessage(GetBea2(sender));
+                case "king":
+                case "simple":
+                    sender.sendMessage(GetKing(sender));
+            }
+        }
+
     }
-    public List<BaseComponent[]> SettingList(CommandSender sender) {
-        Server server = sender.getServer();
-        Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
-        String Team1 = TeamName.get("Team1");
-        String Team2 = TeamName.get("Team2");
-        String Team3 = TeamName.get("Team3");
-        Location Spawn1 = TeamRes.get("Team1");
-        Location Spawn2 = TeamRes.get("Team2");
-        // 設定一覧を作成して、返す
+    public BaseComponent[] GetTeam(CommandSender sender) {
+        // チームのリストを返す
         BaseComponent[] TeamList = new ComponentBuilder(
                 new TextComponent(new ComponentBuilder()
-                    .append(
-                          "\n- 戦闘チーム1 : " + Team1
-                        + "\n- 戦闘チーム2 : " + Team2
-                        + "\n- 観覧チーム : " + Team3
-                    ).color(ChatColor.GREEN)
-                    .create()
+                        .append("\n- 戦闘チーム1 : Red"
+                                + "\n- 戦闘チーム2 : Blue"
+                                + "\n- 観覧チーム : Co"
+                        ).color(ChatColor.GREEN)
+                        .create()
                 )
         ).create();
-        // 設定したリスポーン地点の座標をx,y,zに保存
+        return TeamList;
+    }
+    public BaseComponent[] GetKing(CommandSender sender) {
+        // チームのリストを返す
+        BaseComponent[] KingList = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                        .append("\n- 赤チーム : " + King.get("Team1").getName()
+                                + "\n- 青チーム : " + King.get("Team2").getName()
+                        ).color(ChatColor.GREEN)
+                        .create()
+                )
+        ).create();
+        return KingList;
+    }
+    public BaseComponent[] GetRes1(CommandSender sender) {
+        Location Spawn1 = TeamRes.get("Team1");
         String spa1 = Spawn1.getBlockX() + " " + Spawn1.getBlockY() + " " + Spawn1.getBlockZ();
-        String spa2 = Spawn2.getBlockX() + " " + Spawn2.getBlockY() + " " + Spawn2.getBlockZ();
 
-        // クリックしたらTPする不思議なブロックを生成
-        BaseComponent[] TP1 = new ComponentBuilder(
+        BaseComponent[] TPRes1 = new ComponentBuilder(
                 new TextComponent(new ComponentBuilder()
                         .append("\n- チーム1のリス地 : " + spa1).color(ChatColor.GREEN)
-                        .create())
+                        .create()
+                )
         )
                 .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
                         .append("クリックでチーム1のリス地へTP")
@@ -578,7 +622,13 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 ))
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + spa1))
                 .create();
-        BaseComponent[] TP2 = new ComponentBuilder(
+        return TPRes1;
+    }
+    public BaseComponent[] GetRes2(CommandSender sender) {
+        Location Spawn2 = TeamRes.get("Team2");
+        String spa2 = Spawn2.getBlockX() + " " + Spawn2.getBlockY() + " " + Spawn2.getBlockZ();
+
+        BaseComponent[] TPRes2 = new ComponentBuilder(
                 new TextComponent(new ComponentBuilder()
                         .append("\n- チーム2のリス地 : " + spa2).color(ChatColor.GREEN)
                         .create())
@@ -589,10 +639,41 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 ))
                 .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + spa2))
                 .create();
-        
-        // 全部を結合
+        return TPRes2;
+    }
+    public BaseComponent[] GetBea1(CommandSender sender) {
+        Location Beacon1 = Beacon.get("Team1");
+        String bea1 = Beacon1.getBlockX() + " " + Beacon1.getBlockY() + " " + Beacon1.getBlockZ();
 
-        return Arrays.asList(TeamList,TP1,TP2);
+        BaseComponent[] TPBea1 = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                        .append("\n- チーム2のリス地 : " + bea1).color(ChatColor.GREEN)
+                        .create())
+        )
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                        .append("クリックでチーム2のリス地へTP")
+                        .create()
+                ))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + bea1))
+                .create();
+        return TPBea1;
+    }
+    public BaseComponent[] GetBea2(CommandSender sender) {
+        Location Beacon2 = Beacon.get("Team2");
+        String bea2 = Beacon2.getBlockX() + " " + Beacon2.getBlockY() + " " + Beacon2.getBlockZ();
+
+        BaseComponent[] TPBea2 = new ComponentBuilder(
+                new TextComponent(new ComponentBuilder()
+                        .append("\n- チーム2のリス地 : " + bea2).color(ChatColor.GREEN)
+                        .create())
+        )
+                .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                        .append("クリックでチーム2のリス地へTP")
+                        .create()
+                ))
+                .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + bea2))
+                .create();
+        return TPBea2;
     }
     public void Simota(CommandSender sender, Object[] args) {
         if (TeamName.get("Team1") == null || TeamName.get("Team2") == null) {

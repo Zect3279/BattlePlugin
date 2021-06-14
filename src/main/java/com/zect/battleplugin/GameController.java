@@ -21,10 +21,11 @@ public class GameController extends JavaPlugin implements Listener {
     public static boolean GamePlaying = false;
 
     public static void SurvivalStart(Server server,
-                             Scoreboard MainBoard,
-                             Map<String, String> TeamName,
-                             Map<String, Location> TeamRes,
-                             Map<String, Location> Beacon) {
+                                     Scoreboard MainBoard,
+                                     Map<String, String> TeamName,
+                                     Map<String, Location> TeamRes,
+                                     Map<String, Location> Beacon,
+                                     Integer ticketLimit) {
         // 使うであろう変数を用意
         Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
         Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
@@ -45,6 +46,28 @@ public class GameController extends JavaPlugin implements Listener {
                                  Map<String, String> TeamName,
                                  Map<String, Location> TeamRes,
                                  Map<String, Player> King) {
+        // 使うであろう変数を用意
+        Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
+        Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
+        Team Team3 = MainBoard.getTeam(TeamName.get("Team3"));
+        Location Spawn1 = TeamRes.get("Team1");
+        Location Spawn2 = TeamRes.get("Team2");
+        Player King1 = King.get("Team1");
+        Player King2 = King.get("Team2");
+
+        // ゲーム開始機構
+        Count("赤チーム大将:" + Team1.getColor() + King1.getName()
+                + ChatColor.WHITE + "\n青チーム大将:" + Team2.getColor() + King2.getName()
+                + ChatColor.WHITE + "\n大将戦");
+        // ゲーム開始
+//         Controll();
+    }
+    public static void SimpleStart(Server server,
+                                   Scoreboard MainBoard,
+                                   Map<String, String> TeamName,
+                                   Map<String, Location> TeamRes,
+                                   Map<String, Player> King,
+                                   Integer timeLimit) {
         // 使うであろう変数を用意
         Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
         Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
