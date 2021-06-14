@@ -144,10 +144,10 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             sender.sendMessage("チームに所属してないよ");
         } else if (team.getName() == "Red") {
             King.put("Team1", king);
-            sender.sendMessage("赤チームの大将を決定した");
+            sender.sendMessage("[" + king.getName() + "]" + "を赤チームの大将を決定した");
         } else if (team.getName() == "Blue") {
             King.put("Team2", king);
-            sender.sendMessage("青チームの大将を決定した");
+            sender.sendMessage("[" + king.getName() + "]" + "を青チームの大将を決定した");
         }
 
     }
