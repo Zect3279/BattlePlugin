@@ -11,6 +11,8 @@ import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class GameController extends JavaPlugin implements Listener {
 
@@ -84,12 +86,16 @@ public class GameController extends JavaPlugin implements Listener {
          * の関数を発火
          */
         GamePlaying = true;
-//        Integer num = 5;
-//        ExecutorService exec = Executors.newCachedThreadPool();
-//        while (num > 0) {
-//            exec.submit(new Bording());
-//            exec.submit(new WinChecker());
-//        }
+        ExecutorService exec = Executors.newCachedThreadPool();
+        while (true) {
+            exec.submit(new People());
+        }
+    }
+}
+class People implements Runnable {
+    public void run() {
+        // 下に表示するやつ
+        // <__人が参加中 赤チーム:__ 青チーム:__>
     }
 }
 

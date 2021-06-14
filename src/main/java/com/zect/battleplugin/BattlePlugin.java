@@ -61,36 +61,15 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .withArguments(gameruleArgument)
                         .executes(this::SetGameRule)
                 )
-                .withSubcommand(new CommandAPICommand("FightTeam")
-                        .withSubcommand(new CommandAPICommand("list")
-                                .executes(this::ShowFighters)
-                        )
-                        .withSubcommand(new CommandAPICommand("add")
-                                .withArguments(teamArgument)
-                                .executes(this::AddFighters)
-                        )
-                        .withSubcommand(new CommandAPICommand("remove")
-                                .withArguments(teamArgument)
-                                .executes(this::RemoveFighters)
-                        )
-                )
-                .withSubcommand(new CommandAPICommand("WatchTeam")
-                        .withSubcommand(new CommandAPICommand("list")
-                                .executes(this::ShowWatchers)
-                        )
-                        .withSubcommand(new CommandAPICommand("add")
-                                .withArguments(teamArgument)
-                                .executes(this::AddWatcher)
-                        )
-                        .withSubcommand(new CommandAPICommand("remove")
-                                .withArguments(teamArgument)
-                                .executes(this::RemoveWatcher)
-                        )
-                )
                 .withSubcommand(new CommandAPICommand("Respawn")
                         .withArguments(teamArgument)
                         .withArguments(new LocationArgument("SpawnPoint"))
                         .executes(this::SpawnPoint)
+                )
+                .withSubcommand(new CommandAPICommand("Beacon")
+                        .withArguments(teamArgument)
+                        .withArguments(new LocationArgument("BeaconPosition"))
+                        .executes(this::BeaconPosition)
                 )
                 .withSubcommand(new CommandAPICommand("SetTimeLimit")
                         .withArguments(new TimeArgument("second"))
@@ -109,6 +88,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 .register();
 
     }
+
 
     private void toCount(CommandSender sender, Object[] args) {
         Server server = sender.getServer();
@@ -134,9 +114,13 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     // <Team, Team.getName()> チーム番号と名前を保存
     Map<String, String> TeamName = new HashMap<>();
 
+    // ビーコンの位置を設定（サバイバルのみ使用）
+    Map<String, Location> Beacon = new HashMap<>();
 
     // デフォルトの秒数を300秒に
     public Integer timeLimit = 300;
+
+    String gameType = null;
 
 
     public void SetGameRule(CommandSender sender, Object[] args) {
@@ -144,15 +128,85 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         sender.sendMessage(rule);
         switch (rule) {
             case "survival":
-                sender.sendMessage("サバイバル攻城戦");
+                sender.sendMessage("サバイバル戦");
+                gameType = "survival";
                 break;
-            case "simple":
-                sender.sendMessage("シンプル攻城戦");
-                break;
+            case "king":
+                sender.sendMessage("大将戦");
+                gameType = "king";
             default:
                 sender.sendMessage("エラーが発生");
                 break;
         }
+    }
+    private void BeaconPosition(CommandSender sender, Object[] args) {
+        // スポーン地点設定
+        String fighter = (String) args[0];
+        Server server = sender.getServer();
+        Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
+
+        String Team1N = TeamName.get("Team1");
+        String Team2N = TeamName.get("Team2");
+        String FighterName = Fighter.getName();
+        Location fighterBea = (Location) args[1];
+
+        if (!FighterName.equals(Team1N) && !FighterName.equals(Team2N)) {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "指定されたチームは、戦闘チームに設定されていません。\n"
+                    + "チーム名を確認して、もう一度試してください。"
+            );
+        } else if (FighterName.equals(Team1N)) {
+            Beacon.put("Team1", fighterBea);
+            // 設定したリスポーン地点の座標をx,y,zに保存
+            Integer x = fighterBea.getBlockX();
+            Integer y = fighterBea.getBlockY();
+            Integer z = fighterBea.getBlockZ();
+
+            // クリックしたらTPする不思議なブロックを生成
+            BaseComponent[] TP1 = new ComponentBuilder(
+                    new TextComponent(new ComponentBuilder()
+                            .append("[Team1ビーコンへTP]").color(ChatColor.GOLD)
+                            .create())
+            )
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                            .append("クリックでチーム1のビーコンへTP")
+                            .create()
+                    ))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + x + " " + y + " " + z))
+                    .create();
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                    + ChatColor.GREEN + "のビーコンを設定しました。\n以下のブロックから設定場所にTPできます。"
+            );
+            sender.sendMessage(TP1);
+        } else if (FighterName.equals(Team2N)) {
+            Beacon.put("Team2", fighterBea);
+            Integer x = fighterBea.getBlockX();
+            Integer y = fighterBea.getBlockY();
+            Integer z = fighterBea.getBlockZ();
+            BaseComponent[] TP2 = new ComponentBuilder(
+                    new TextComponent(new ComponentBuilder()
+                            .append("[Team2ビーコンへTP]").color(ChatColor.GOLD)
+                            .create())
+            )
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                            .append("クリックでチーム2のビーコンへTP")
+                            .create()
+                    ))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + x + " " + y + " " + z))
+                    .create();
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                    + ChatColor.GREEN + "のリス地を設定しました。\n以下のブロックから設定場所にTPできます。"
+            );
+            sender.sendMessage(TP2);
+        } else {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "エラーが発生しました。\n"
+                    + "引数等を確認して、再度試してください。"
+            );
+        }
+
     }
     public void TitleCall(CommandSender sender, Object[] args) {
         Util.setTitle("マイクラ戦争プラグイン", "企画:KUN(?) 制作:Zect 命名:nori", 500);
@@ -189,11 +243,14 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         GameController.start(server, MainBoard, TeamName, TeamRes, timeLimit);
     }
     public void GiveTeam(CommandSender sender, Object[] args) {
-        Random random = new Random();
         // チームに所属させる
         // チームカラーを取得して、その色で
         // [0 - 0]
         // みたいに表示する
+        Random random = new Random();
+        // チーム作成
+        AddTeams(sender);
+
         Server server = sender.getServer();
         Scoreboard score = server.getScoreboardManager().getMainScoreboard();
         String Team1 = TeamName.get("Team1");
@@ -201,11 +258,6 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
         String size1 = "0";
         String size2 = "0";
-
-
-        if (score.getTeam(Team1) == null || score.getTeam(Team2) == null) {
-            return;
-        }
 
         try {
             Util.setTitle(size1 + " - " + size2, "チーム分けを開始", 100);
@@ -261,6 +313,28 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             e.printStackTrace();
         }
     }
+    public void AddTeams(CommandSender sender) {
+        // チームを作成・登録
+
+        // コマンド入力時に取得したチーム名からチームオブジェクトを持ってくる
+        Server server = sender.getServer();
+        Scoreboard Board = server.getScoreboardManager().getMainScoreboard();
+
+        Team team1 = Board.registerNewTeam("Red");
+        Team team2 = Board.registerNewTeam("Blue");
+        Team team3 = Board.registerNewTeam("Co");
+
+        team1.setColor(org.bukkit.ChatColor.RED);
+        team2.setColor(org.bukkit.ChatColor.BLUE);
+        team3.setColor(org.bukkit.ChatColor.AQUA);
+
+        // チーム名を追加
+        // 1,2は戦闘、3は観覧
+        TeamName.put("Team1", team1.getName());
+        TeamName.put("Team2", team2.getName());
+        TeamName.put("Team3", team3.getName());
+
+    }
     public String CheckCanPlay() {
         // ゲーム開始可能か確認する
         // 開始できなかったら、reasonを返す
@@ -310,105 +384,6 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 + ChatColor.GREEN + "に設定しました。"
         );
     }
-    public void AddFighters(CommandSender sender, Object[] args) {
-        // 戦闘チーム追加
-
-        // コマンド入力時に取得したチーム名からチームオブジェクトを持ってくる
-        String fighter = (String) args[0];
-        Server server = sender.getServer();
-        Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
-
-        // 登録されてるかもしれないチーム名を取得
-        // 1,2は戦闘、3は観覧
-        String Team1 = TeamName.get("Team1");
-        String Team2 = TeamName.get("Team2");
-        String Team3 = TeamName.get("Team3");
-        // 登録しようとしてるチームの名前を取得
-        String FighterName = Fighter.getName();
-
-        if (FighterName == Team3) {
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
-                    + ChatColor.GREEN + "は観覧チームに参加しているため、攻城戦には参加できません。"
-            );
-        } else if (Team1 == null) {
-            if (FighterName.equals(Team2)) {
-                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                        + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
-                        + ChatColor.GREEN + "は既に戦闘チームに追加されています。"
-                );
-            } else {
-                TeamName.put("Team1", FighterName);
-                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                        + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
-                        + ChatColor.GREEN + "を戦闘チームに追加しました。"
-                );
-            }
-        } else if (Team2 == null) {
-            if (FighterName.equals(Team1)) {
-                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                        + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
-                        + ChatColor.GREEN + "は既に戦闘チームに追加されています。"
-                );
-            } else {
-                TeamName.put("Team2", FighterName);
-                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                        + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
-                        + ChatColor.GREEN + "を戦闘チームに追加しました。"
-                );
-            }
-        } else {
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + "二チーム登録されているため、\nこれ以上のチームを登録することはできません。"
-                    + "\n別チームを登録したい場合は、\n"
-                    + ChatColor.GREEN + "/siege FightTeam remove <Team>\n"
-                    + ChatColor.RED + "でremoveした後に、もう一度試してください。"
-
-            );
-        }
-
-    }
-    public void RemoveFighters(CommandSender sender, Object[] args) {
-        // 戦闘チーム撤去
-
-        // 細かい説明は、AddFightersを見てね
-        String fighter = (String) args[0];
-        Server server = sender.getServer();
-        Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
-
-        String Team1 = TeamName.get("Team1");
-        String Team2 = TeamName.get("Team2");
-        String FighterName = Fighter.getName();
-
-        if (FighterName == Team1) {
-            TeamName.put("Team1", null);
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
-                    + ChatColor.GREEN + "を戦闘チームから削除しました。"
-            );
-        } else if (FighterName == Team2) {
-            TeamName.put("Team2", null);
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
-                    + ChatColor.GREEN + "を戦闘チームから削除しました。"
-            );
-        } else if (Team1 == null && Team2 == null) {
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + "チームリストに何も入っていないため、\nこれ以上チームを削除することはできません。"
-                    + "\nチームを登録したい場合は、\n"
-                    + ChatColor.GREEN + "/siege FightTeam add <Team>\n"
-                    + ChatColor.RED + "で追加できます。"
-
-            );
-
-        } else {
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + "指定されたチームは、戦闘チームに設定されていません。\n"
-                    + "チーム名を確認して、もう一度試してください。"
-            );
-        }
-
-    }
     public void ShowFighters(CommandSender sender, Object[] args) {
         // チーム一覧を表示
         // 設定されてなかったら、nullが返る
@@ -417,80 +392,6 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 + "\n戦闘チーム1 : " + TeamName.get("Team1")
                 + "\n戦闘チーム2 : " + TeamName.get("Team2")
         );
-    }
-    public void AddWatcher(CommandSender sender, Object[] args) {
-        // 観覧チームを追加
-
-        // 細かい説明は、AddFightersに書いてある
-        String watcher = (String) args[0];
-        Server server = sender.getServer();
-        Team Watcher = server.getScoreboardManager().getMainScoreboard().getTeam(watcher);
-
-        String Team1 = TeamName.get("Team1");
-        String Team2 = TeamName.get("Team2");
-        String Team3 = TeamName.get("Team3");
-        String FighterName = Watcher.getName();
-
-        if (FighterName == Team1 || FighterName == Team2) {
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + Watcher.getColor() + "[" + Watcher.getName() + "]\n"
-                    + ChatColor.GREEN + "は戦闘チームに参加しているため、攻城戦の観覧はできません。"
-            );
-        } else if (Team3 == null) {
-            if (FighterName.equals(Team3)) {
-                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                        + Watcher.getColor() + "[" + Watcher.getName() + "]\n"
-                        + ChatColor.GREEN + "は既に観覧チームに追加されています。"
-                );
-            } else {
-                TeamName.put("Team3", FighterName);
-                sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                        + Watcher.getColor() + "[" + Watcher.getName() + "]\n"
-                        + ChatColor.GREEN + "を観覧チームに追加しました。"
-                );
-            }
-        } else {
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + "既に登録されているため、\nこれ以上のチームを登録することはできません。"
-                    + "\n別チームを登録したい場合は、\n"
-                    + ChatColor.GREEN + "/siege FightTeam remove <Team>\n"
-                    + ChatColor.RED + "でremoveした後に、もう一度試してください。"
-
-            );
-        }
-
-    }
-    public void RemoveWatcher(CommandSender sender, Object[] args) {
-        // 観覧チームを削除
-
-        // 細かい説明は、AddFightersに書いてある
-        String watcher = (String) args[0];
-        Server server = sender.getServer();
-        Team Watcher = server.getScoreboardManager().getMainScoreboard().getTeam(watcher);
-
-        String Team3 = TeamName.get("Team3");
-        String FighterName = Watcher.getName();
-
-        if (FighterName == Team3) {
-            TeamName.put("Team3", null);
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + Watcher.getColor() + "[" + Watcher.getName() + "]\n"
-                    + ChatColor.GREEN + "を観覧チームから削除しました。"
-            );
-        } else if (Team3 == null) {
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + "チームリストに何も入っていないため、\nこれ以上チームを削除することはできません。"
-                    + "\nチームを登録したい場合は、\n"
-                    + ChatColor.GREEN + "/siege WatchTeam add <Team>\n"
-                    + ChatColor.RED + "で追加できます。"
-
-            );
-        } else {
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + "指定されたチームは、観覧チームに設定されていません。\n"
-                    + "チーム名を確認して、もう一度試してください。"
-            );
-        }
     }
     public void ShowWatchers(CommandSender sender, Object[] args) {
         // 観覧チームを表示

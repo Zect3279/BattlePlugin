@@ -3,6 +3,8 @@
 server/
 repo/
 
+memo.md
+
 *.iml
 *.ipr
 *.iws
