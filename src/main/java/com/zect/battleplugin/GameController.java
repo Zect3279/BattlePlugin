@@ -9,7 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -19,7 +18,7 @@ public class GameController extends JavaPlugin implements Listener {
 
 
 
-    public static void start(Server server, Scoreboard MainBoard, Map<String, String> TeamName, ArrayList<Location> Corner, Map<String, Location> TeamRes, Integer timeLimit) {
+    public static void start(Server server, Scoreboard MainBoard, Map<String, String> TeamName, Map<String, Location> TeamRes, Integer timeLimit) {
         /* 引数
          * - [x] 戦闘チーム
          * - [x] 観覧チーム
@@ -53,19 +52,19 @@ public class GameController extends JavaPlugin implements Listener {
             Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTitle("開始まで 4秒", "マイクラ戦争が始まるよ", 100);
+            Util.setTitle("開始まで 4秒前", "マイクラ戦争が始まるよ", 100);
             Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTitle("開始まで 3秒", "マイクラ戦争が始まるよ", 100);
+            Util.setTitle("開始まで 3秒前", "マイクラ戦争が始まるよ", 100);
             Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTitle("開始まで 2秒", "マイクラ戦争が始まるよ", 100);
+            Util.setTitle("開始まで 2秒前", "マイクラ戦争が始まるよ", 100);
             Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTitle("開始まで 1秒", "マイクラ戦争が始まるよ", 100);
+            Util.setTitle("開始まで 1秒前", "マイクラ戦争が始まるよ", 100);
             Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
@@ -94,12 +93,6 @@ public class GameController extends JavaPlugin implements Listener {
     }
 }
 
-//public class Bording implements Runnable {
-//
-//    public void run() {
-//        // ボーダー処理
-//    }
-//}
 //public class WinChecker implements Runnable {
 //
 //    public void run() {
