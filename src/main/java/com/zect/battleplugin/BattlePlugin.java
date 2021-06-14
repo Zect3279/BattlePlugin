@@ -194,53 +194,6 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         */
         GameController.start(server, MainBoard, TeamName, Corner, TeamRes, timeLimit);
     }
-
-    public void Simota(CommandSender sender, Object[] args) {
-        Server server = sender.getServer();
-        GameController.Count(server);
-        Collection<Player> players = (Collection<Player>) Bukkit.getOnlinePlayers();
-        /* titleでカウントダウン
-         * 『ゲーム開始まで 5秒前』
-         * 『3』
-         * 『2』
-         * 『1』
-         * 『ゲーム開始』
-         */
-        try {
-            Util.setTitle("開始まで 5秒前", "マイクラ戦争が始まるよ", 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
-            Thread.sleep(1000);
-
-            Util.setTitle("開始まで 4秒", "マイクラ戦争が始まるよ", 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
-            Thread.sleep(1000);
-
-            Util.setTitle("開始まで 3秒", "マイクラ戦争が始まるよ", 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
-            Thread.sleep(1000);
-
-            Util.setTitle("開始まで 2秒", "マイクラ戦争が始まるよ", 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
-            Thread.sleep(1000);
-
-            Util.setTitle("開始まで 1秒", "マイクラ戦争が始まるよ", 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
-            Thread.sleep(1000);
-
-            Util.setTitle("ゲーム開始！", "50人マイクラ戦争", 100);
-            Util.sendSound(players, Sound.BLOCK_ANVIL_PLACE);
-
-            Thread.sleep(700);
-            Util.setTitle("____チームの勝利", "ゲーム終了", 150);
-            for(Player player : players) {
-                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE,0.1f,1);
-            }
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
     public void GiveTeam(CommandSender sender, Object[] args) {
         Random random = new Random();
         // チームに所属させる
@@ -795,6 +748,62 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         // 全部を結合
 
         return Arrays.asList(TeamList,TP1,TP2,TPCor1,TPCor2);
+    }
+    public void Simota(CommandSender sender, Object[] args) {
+        if (TeamName.get("Team1") == null || TeamName.get("Team2") == null) {
+            sender.sendMessage("チームが設定できてないよ");
+        }
+
+        Server server = sender.getServer();
+        GameController.Count(server);
+        Collection<Player> players = (Collection<Player>) Bukkit.getOnlinePlayers();
+        Random random = new Random();
+        Team team = null;
+        Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
+
+        Integer num = random.nextInt(2);
+            if (num == 0) {
+                team = MainBoard.getTeam(TeamName.get("Team1"));
+            } else if (num == 1) {
+                team = MainBoard.getTeam(TeamName.get("Team2"));
+            } else {
+                return;
+            }
+
+        try {
+            Util.setTitle("開始まで 5秒前", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 4秒", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 3秒", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 2秒", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 1秒", "マイクラ戦争が始まるよ", 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("ゲーム開始！", "50人マイクラ戦争", 100);
+            Util.sendSound(players, Sound.BLOCK_ANVIL_PLACE);
+
+            Thread.sleep(700);
+            Util.setTitle(team.getColor() + team.getName() + ChatColor.WHITE + "チームの勝利", "ゲーム終了", 150);
+            for(Player player : players) {
+                player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE,0.1f,1);
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
