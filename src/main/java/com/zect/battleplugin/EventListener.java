@@ -43,8 +43,18 @@ public class EventListener implements Listener {
          */
     }
     @EventHandler
-    public void onMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        player.sendMessage("hello");
+    public void onBlockBreak(BlockBreakEvent event) {
+        boolean Now = GameController.GamePlaying;
+        if (!Now) {
+            return;
+        }
+        Block block = event.getBlock();
+        if (block.getType() != Material.BEACON) {
+            return;
+        }
+        if (block.getLocation != Beacon1 && block.getLocation != Beacon2) {
+            event.getPlayer().sendMessage("これは壊すビーコンじゃないよ")
+        }
+        // ボスバーの処理
     }
 }
