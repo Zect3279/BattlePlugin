@@ -57,6 +57,10 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 //                 .withSubcommand(new CommandAPICommand("Teaming")
 //                         .executes(this::GiveTeam)
 //                 )
+                .withSubcommand(new CommandAPICommand("setKing")
+                        .withArguments(new PlayerArgument("target"))
+                        .executes(this::SetKings)
+                )
                 .withSubcommand(new CommandAPICommand("GameRule")
                         .withArguments(gameruleArgument)
                         .executes(this::SetGameRule)
@@ -92,7 +96,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
     private void toCount(CommandSender sender, Object[] args) {
         Server server = sender.getServer();
-        GameController.Count(server);
+        GameController.Count("マイクラ戦争");
     }
 
     @Override
@@ -117,96 +121,55 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     // ビーコンの位置を設定（サバイバルのみ使用）
     Map<String, Location> Beacon = new HashMap<>();
 
+    // 大将
+    Map<String, Player> King = new HashMap<>();
+
     // デフォルトの秒数を300秒に
     public Integer timeLimit = 300;
 
+    // デフォルトのチケット数を200に
+    public Integer ticketLimit = 200;
+
     String gameType = null;
 
+
+    private void SetKings(CommandSender sender, Object[] args) {
+        // Kingを追加
+        Player king = (Player) args[0];
+        Server server = sender.getServer();
+        Scoreboard score = server.getScoreboardManager().getMainScoreboard();
+        Team team = score.getPlayerTeam(king);
+
+        if (team == null) {
+            sender.sendMessage("チームに所属してないよ");
+        } else if (team.getName() == "Red") {
+            King.put("Team1", king);
+            sender.sendMessage("赤チームの大将を決定した");
+        } else if (team.getName() == "Blue") {
+            King.put("Team2", king);
+            sender.sendMessage("青チームの大将を決定した");
+        }
+
+    }
 
     public void SetGameRule(CommandSender sender, Object[] args) {
         String rule = (String) args[0];
         sender.sendMessage(rule);
         switch (rule) {
             case "survival":
-                sender.sendMessage("サバイバル戦");
+                sender.sendMessage("サバイバル戦\n・時間制限なし\n・チケット0で終了\n・ビーコン有り");
                 gameType = "survival";
                 break;
             case "king":
-                sender.sendMessage("大将戦");
+                sender.sendMessage("大将戦\n・時間制限なし\n・大将を殺して終了");
                 gameType = "king";
+            case "simple":
+                sender.sendMessage("シンプル戦\n・時間制限有り\n・大将を殺して終了");
+                gameType = "simple";
             default:
                 sender.sendMessage("エラーが発生");
                 break;
         }
-    }
-    private void BeaconPosition(CommandSender sender, Object[] args) {
-        // スポーン地点設定
-        String fighter = (String) args[0];
-        Server server = sender.getServer();
-        Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
-
-        String Team1N = TeamName.get("Team1");
-        String Team2N = TeamName.get("Team2");
-        String FighterName = Fighter.getName();
-        Location fighterBea = (Location) args[1];
-
-        if (!FighterName.equals(Team1N) && !FighterName.equals(Team2N)) {
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + "指定されたチームは、戦闘チームに設定されていません。\n"
-                    + "チーム名を確認して、もう一度試してください。"
-            );
-        } else if (FighterName.equals(Team1N)) {
-            Beacon.put("Team1", fighterBea);
-            // 設定したリスポーン地点の座標をx,y,zに保存
-            Integer x = fighterBea.getBlockX();
-            Integer y = fighterBea.getBlockY();
-            Integer z = fighterBea.getBlockZ();
-
-            // クリックしたらTPする不思議なブロックを生成
-            BaseComponent[] TP1 = new ComponentBuilder(
-                    new TextComponent(new ComponentBuilder()
-                            .append("[Team1ビーコンへTP]").color(ChatColor.GOLD)
-                            .create())
-            )
-                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                            .append("クリックでチーム1のビーコンへTP")
-                            .create()
-                    ))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + x + " " + y + " " + z))
-                    .create();
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
-                    + ChatColor.GREEN + "のビーコンを設定しました。\n以下のブロックから設定場所にTPできます。"
-            );
-            sender.sendMessage(TP1);
-        } else if (FighterName.equals(Team2N)) {
-            Beacon.put("Team2", fighterBea);
-            Integer x = fighterBea.getBlockX();
-            Integer y = fighterBea.getBlockY();
-            Integer z = fighterBea.getBlockZ();
-            BaseComponent[] TP2 = new ComponentBuilder(
-                    new TextComponent(new ComponentBuilder()
-                            .append("[Team2ビーコンへTP]").color(ChatColor.GOLD)
-                            .create())
-            )
-                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
-                            .append("クリックでチーム2のビーコンへTP")
-                            .create()
-                    ))
-                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + x + " " + y + " " + z))
-                    .create();
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
-                    + ChatColor.GREEN + "のリス地を設定しました。\n以下のブロックから設定場所にTPできます。"
-            );
-            sender.sendMessage(TP2);
-        } else {
-            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
-                    + ChatColor.RED + "エラーが発生しました。\n"
-                    + "引数等を確認して、再度試してください。"
-            );
-        }
-
     }
     public void TitleCall(CommandSender sender, Object[] args) {
         Util.setTitle("マイクラ戦争プラグイン", "企画:KUN(?) 制作:Zect 命名:nori", 500);
@@ -240,7 +203,21 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         * - [x] スコアボードobj
         * - [x] サーバーobj
         */
-        GameController.start(server, MainBoard, TeamName, TeamRes, timeLimit);
+        switch (gameType) {
+            case "survival":
+                GameController.SurvivalStart(server, MainBoard, TeamName, TeamRes, Beacon);
+                gameType = "survival";
+                break;
+            case "king":
+                GameController.KingStart(server, MainBoard, TeamName, TeamRes, King);
+                gameType = "king";
+            case "simple":
+                sender.sendMessage("シンプル戦\n・時間制限有り\n・大将を殺して終了");
+                gameType = "simple";
+            default:
+                sender.sendMessage("エラーが発生");
+                break;
+        }
     }
     public void GiveTeam(CommandSender sender, Object[] args) {
         // チームに所属させる
@@ -469,6 +446,75 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         }
 
     }
+    private void BeaconPosition(CommandSender sender, Object[] args) {
+        // スポーン地点設定
+        String fighter = (String) args[0];
+        Server server = sender.getServer();
+        Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
+
+        String Team1N = TeamName.get("Team1");
+        String Team2N = TeamName.get("Team2");
+        String FighterName = Fighter.getName();
+        Location fighterBea = (Location) args[1];
+
+        if (!FighterName.equals(Team1N) && !FighterName.equals(Team2N)) {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "指定されたチームは、戦闘チームに設定されていません。\n"
+                    + "チーム名を確認して、もう一度試してください。"
+            );
+        } else if (FighterName.equals(Team1N)) {
+            Beacon.put("Team1", fighterBea);
+            // 設定したリスポーン地点の座標をx,y,zに保存
+            Integer x = fighterBea.getBlockX();
+            Integer y = fighterBea.getBlockY();
+            Integer z = fighterBea.getBlockZ();
+
+            // クリックしたらTPする不思議なブロックを生成
+            BaseComponent[] TP1 = new ComponentBuilder(
+                    new TextComponent(new ComponentBuilder()
+                            .append("[Team1ビーコンへTP]").color(ChatColor.GOLD)
+                            .create())
+            )
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                            .append("クリックでチーム1のビーコンへTP")
+                            .create()
+                    ))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + x + " " + y + " " + z))
+                    .create();
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                    + ChatColor.GREEN + "のビーコンを設定しました。\n以下のブロックから設定場所にTPできます。"
+            );
+            sender.sendMessage(TP1);
+        } else if (FighterName.equals(Team2N)) {
+            Beacon.put("Team2", fighterBea);
+            Integer x = fighterBea.getBlockX();
+            Integer y = fighterBea.getBlockY();
+            Integer z = fighterBea.getBlockZ();
+            BaseComponent[] TP2 = new ComponentBuilder(
+                    new TextComponent(new ComponentBuilder()
+                            .append("[Team2ビーコンへTP]").color(ChatColor.GOLD)
+                            .create())
+            )
+                    .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                            .append("クリックでチーム2のビーコンへTP")
+                            .create()
+                    ))
+                    .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp " + x + " " + y + " " + z))
+                    .create();
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + Fighter.getColor() + "[" + Fighter.getName() + "]\n"
+                    + ChatColor.GREEN + "のリス地を設定しました。\n以下のブロックから設定場所にTPできます。"
+            );
+            sender.sendMessage(TP2);
+        } else {
+            sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
+                    + ChatColor.RED + "エラーが発生しました。\n"
+                    + "引数等を確認して、再度試してください。"
+            );
+        }
+
+    }
     public void CheckSettings(CommandSender sender, Object[] args) {
         // 設定一覧を表示
         // チーム1のリス地へTP
@@ -554,7 +600,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         }
 
         Server server = sender.getServer();
-        GameController.Count(server);
+        GameController.Count("マイクラ戦争");
         Collection<Player> players = (Collection<Player>) Bukkit.getOnlinePlayers();
         Random random = new Random();
         Team team = null;
