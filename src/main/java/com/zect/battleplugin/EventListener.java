@@ -57,4 +57,13 @@ public class EventListener implements Listener {
         }
         // ボスバーの処理
     }
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        // ゲーム開始待機中は動けない
+        boolean Now = GameController.GamePlaying;
+        if (!Now) {
+            return;
+        }
+        event.setCancelled()
+    }
 }
