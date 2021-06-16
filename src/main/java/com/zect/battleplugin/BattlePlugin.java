@@ -5,10 +5,7 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -95,8 +92,43 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .withArguments(new StringArgument("Phase"))
                         .executes(this::TestStart)
                 )
+                .withSubcommand(new CommandAPICommand("beacon")
+                        .withArguments(new LocationArgument("Beacon"))
+                        .executes(this::ReplaceBeacon)
+                )
                 .register();
 
+    }
+
+    private void ReplaceBeacon(CommandSender sender, Object[] args) {
+//        Location place = (Location) args[0];
+//        place.getBlock().setType(Material.BEACON);
+//        place.getWorld().strikeLightningEffect(place);
+
+        Location location = (Location) args[0];
+        int x = location.getBlockX();
+        int y = location.getBlockY() - 1;
+        int z = location.getBlockZ();
+
+        World world = location.getWorld();
+
+
+        for (int xPoint = x-1; xPoint <= x+1 ; xPoint++) {
+            for (int zPoint = z-1 ; zPoint <= z+1; zPoint++) {
+                world.getBlockAt(xPoint, y, zPoint).setType(Material.BEDROCK);
+                world.getBlockAt(xPoint, y-1, zPoint).setType(Material.IRON_BLOCK);
+                world.getBlockAt(xPoint, y-2, zPoint).setType(Material.BEDROCK);
+            }
+        }
+        for (int xPoint = x-1; xPoint <= x+1; xPoint++) {
+            world.getBlockAt(xPoint, y-1, z-2).setType(Material.BEDROCK);
+            world.getBlockAt(xPoint, y-1, z+2).setType(Material.BEDROCK);
+        }
+        for (int zPoint = z-1; zPoint <= z+1; zPoint++) {
+            world.getBlockAt(x-2, y-1, zPoint).setType(Material.BEDROCK);
+            world.getBlockAt(x+2, y-1, zPoint).setType(Material.BEDROCK);
+        }
+        world.getBlockAt(x, y, z).setType(Material.BEACON);
     }
 
 //    private void StopPlayer(CommandSender sender, Object[] objects) {

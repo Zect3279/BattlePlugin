@@ -1,10 +1,7 @@
 package com.zect.battleplugin;
 
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,8 +33,19 @@ public class GameController extends JavaPlugin implements Listener {
         Location Beacon1 = Beacon.get("Team1");
         Location Beacon2 = Beacon.get("Team2");
 
-        // ゲーム開始機構
+        // ビーコンの設置
+        // バリアブロックでの隔離
+        World world = Beacon1.getWorld();
+        Location loc = new Location(world, Beacon1.getX(), Beacon1.getX(), Beacon1.getZ());
+        loc.getBlock().setType(Material.BEACON);
+
+
+        // カウントダウン
         Count("敵のビーコンを破壊しろ！");
+
+        // 服配布
+        //
+
         // ゲーム開始
 //         Controll();
     }
