@@ -1,5 +1,6 @@
 package com.zect.battleplugin;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -46,10 +47,10 @@ public class EventListener implements Listener {
     }
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        boolean Now = GameController.GamePlaying;
-        if (!Now) {
-            return;
-        }
+//        boolean Now = GameController.GamePlaying;
+//        if (!Now) {
+//            return;
+//        }
         Block block = event.getBlock();
         if (block.getType() != Material.BEACON) {
             return;
@@ -59,5 +60,7 @@ public class EventListener implements Listener {
 //        }
         // ボスバーの処理
         event.getPlayer().sendMessage("ビーコン壊したよ");
+        Location beaconPlace = block.getLocation();
+        beaconPlace.getBlock().setType(Material.BEACON);
     }
 }
