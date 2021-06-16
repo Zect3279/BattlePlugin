@@ -64,11 +64,16 @@ public class GameController extends JavaPlugin implements Listener {
                                 + ChatColor.WHITE + "を守れ！",
                         "大将: " + Team1.getColor() + King1.getName()
                                 + ChatColor.WHITE + "を殺せ！");
+                break;
             case 2:
                 KingCount("大将: " + Team2.getColor() + King2.getName()
                                 + ChatColor.WHITE + "を殺せ！",
                         "大将: " + Team2.getColor() + King2.getName()
                                 + ChatColor.WHITE + "を守れ！");
+                break;
+            default:
+                break;
+
         }
         // ゲーム開始
 //         Controll();
@@ -96,11 +101,15 @@ public class GameController extends JavaPlugin implements Listener {
                                 + ChatColor.WHITE + "を守れ！",
                         "大将: " + Team1.getColor() + King1.getName()
                                 + ChatColor.WHITE + "を殺せ！");
+                break;
             case 2:
                 KingCount("大将: " + Team2.getColor() + King2.getName()
                                 + ChatColor.WHITE + "を殺せ！",
                         "大将: " + Team2.getColor() + King2.getName()
                                 + ChatColor.WHITE + "を守れ！");
+                break;
+            default:
+                break;
         }
         // ゲーム開始
 //         Controll();

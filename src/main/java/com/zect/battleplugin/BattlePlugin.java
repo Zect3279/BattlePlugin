@@ -37,7 +37,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
         // ゲームルールのアーギュメントリスト
         List<Argument> gameruleArgument = new ArrayList<>();
-        String[] ruleList = new String[] {"survival", "simple"};
+        String[] ruleList = new String[] {"survival", "simple", "king"};
         gameruleArgument.add(new StringArgument("Rule").overrideSuggestions(ruleList));
 
         // コマンドを設定する
@@ -92,7 +92,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 )
                 .withSubcommand(new CommandAPICommand("start")
                         .withArguments(gameruleArgument)
-                        .withArguments(new IntegerArgument("Phase"))
+                        .withArguments(new StringArgument("Phase"))
                         .executes(this::TestStart)
                 )
                 .register();
@@ -121,19 +121,25 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 break;
             case "king":
             case "simple":
-                Integer phase = (Integer) args[1];
+                String phase = (String) args[1];
                 switch (phase) {
-                    case 1:
+                    case "1":
                         GameController.KingCount("大将: " + ChatColor.RED + "A大将"
                                         + ChatColor.WHITE + "を守れ！",
                                 "大将: " + ChatColor.RED + "A大将"
                                         + ChatColor.WHITE + "を殺せ！");
-                    case 2:
+                        break;
+                    case "2":
                         GameController.KingCount("大将: " + ChatColor.BLUE + "B大将"
                                         + ChatColor.WHITE + "を殺せ！",
                                 "大将: " + ChatColor.BLUE + "B大将"
                                         + ChatColor.WHITE + "を守れ！");
+                        break;
+                    default:
+                        sender.sendMessage("エラーが発生");
+                        break;
                 }
+                break;
             default:
                 sender.sendMessage("エラーが発生");
                 break;
@@ -207,9 +213,11 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             case "king":
                 sender.sendMessage("大将戦\n・時間制限なし\n・大将を殺して終了");
                 gameType = "king";
+                break;
             case "simple":
                 sender.sendMessage("シンプル戦\n・時間制限有り\n・大将を殺して終了");
                 gameType = "simple";
+                break;
             default:
                 sender.sendMessage("エラーが発生");
                 break;
@@ -227,6 +235,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
                     + ChatColor.RED + checking + "\nが設定できていないため、ゲームを開始できません。"
             );
+            return;
 
         }
         // ゲーム開始
@@ -236,7 +245,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         Scoreboard MainBoard = server.getScoreboardManager().getMainScoreboard();
 
         // チーム割当
-        GiveTeam(sender, args);
+//        GiveTeam(sender, args);
         
         /* 引数
         * - [x] 戦闘チーム
@@ -254,8 +263,10 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 break;
             case "king":
                 GameController.KingStart(server, MainBoard, TeamName, TeamRes, King, phase);
+                break;
             case "simple":
                 GameController.SimpleStart(server, MainBoard, TeamName, TeamRes, King, timeLimit, phase);
+                break;
             default:
                 sender.sendMessage("エラーが発生");
                 break;
@@ -272,6 +283,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
         Server server = sender.getServer();
         Scoreboard score = server.getScoreboardManager().getMainScoreboard();
+
         String Team1 = TeamName.get("Team1");
         String Team2 = TeamName.get("Team2");
 
@@ -338,6 +350,16 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         // コマンド入力時に取得したチーム名からチームオブジェクトを持ってくる
         Server server = sender.getServer();
         Scoreboard Board = server.getScoreboardManager().getMainScoreboard();
+
+        if (Board.getTeam("Red") != null) {
+            Board.getTeam("Red").unregister();
+        }
+        if (Board.getTeam("Blue") != null) {
+            Board.getTeam("Blue").unregister();
+        }
+        if (Board.getTeam("Co") != null) {
+            Board.getTeam("Co").unregister();
+        }
 
         Team team1 = Board.registerNewTeam("Red");
         Team team2 = Board.registerNewTeam("Blue");
@@ -619,9 +641,13 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 case "survival":
                     sender.sendMessage(GetBea1(sender));
                     sender.sendMessage(GetBea2(sender));
+                    break;
                 case "king":
                 case "simple":
                     sender.sendMessage(GetKing(sender));
+                    break;
+                default:
+                    break;
             }
         }
 
