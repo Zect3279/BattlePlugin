@@ -46,6 +46,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .executes(this::TitleCall)
                 )
                 .withSubcommand(new CommandAPICommand("start")
+                        .withArguments(new IntegerArgument("Phase"))
                         .executes(this::GameStart)
                 )
                 .withSubcommand(new CommandAPICommand("check")
@@ -89,14 +90,54 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 .withSubcommand(new CommandAPICommand("team")
                         .executes(this::GiveTeam)
                 )
+                .withSubcommand(new CommandAPICommand("start")
+                        .withArguments(gameruleArgument)
+                        .withArguments(new IntegerArgument("Phase"))
+                        .executes(this::TestStart)
+                )
                 .register();
 
     }
 
+//    private void StopPlayer(CommandSender sender, Object[] objects) {
+//        Server server = getServer();
+//        Collection<? extends Player> players = server.getOnlinePlayers();
+//
+//        for (Player player : players) {
+//            player.setCancelled(true);
+//        }
+//    }
+
 
     private void toCount(CommandSender sender, Object[] args) {
-        Server server = sender.getServer();
-        GameController.Count("マイクラ戦争");
+        GameController.Count("マイクラ戦争が始まるよ");
+    }
+
+    private void TestStart(CommandSender sender, Object[] args) {
+        String Type = (String) args[0];
+        switch (Type) {
+            case "survival":
+                GameController.Count("敵のビーコンを破壊しろ！");
+                break;
+            case "king":
+            case "simple":
+                Integer phase = (Integer) args[1];
+                switch (phase) {
+                    case 1:
+                        GameController.KingCount("大将: " + ChatColor.RED + "A大将"
+                                        + ChatColor.WHITE + "を守れ！",
+                                "大将: " + ChatColor.RED + "A大将"
+                                        + ChatColor.WHITE + "を殺せ！");
+                    case 2:
+                        GameController.KingCount("大将: " + ChatColor.BLUE + "B大将"
+                                        + ChatColor.WHITE + "を殺せ！",
+                                "大将: " + ChatColor.BLUE + "B大将"
+                                        + ChatColor.WHITE + "を守れ！");
+                }
+            default:
+                sender.sendMessage("エラーが発生");
+                break;
+        }
     }
 
     @Override
@@ -129,6 +170,9 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
     // デフォルトのチケット数を200に
     public Integer ticketLimit = 200;
+
+    // デフォルトのビーコン数を20に
+    public Integer beaconLimit = 20;
 
     String gameType = null;
 
@@ -203,14 +247,15 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         * - [x] スコアボードobj
         * - [x] サーバーobj
         */
+        Integer phase = (Integer) args[0];
         switch (gameType) {
             case "survival":
-                GameController.SurvivalStart(server, MainBoard, TeamName, TeamRes, Beacon, ticketLimit);
+                GameController.SurvivalStart(server, MainBoard, TeamName, TeamRes, Beacon, ticketLimit, beaconLimit);
                 break;
             case "king":
-                GameController.KingStart(server, MainBoard, TeamName, TeamRes, King);
+                GameController.KingStart(server, MainBoard, TeamName, TeamRes, King, phase);
             case "simple":
-                GameController.SimpleStart(server, MainBoard, TeamName, TeamRes, King, timeLimit);
+                GameController.SimpleStart(server, MainBoard, TeamName, TeamRes, King, timeLimit, phase);
             default:
                 sender.sendMessage("エラーが発生");
                 break;

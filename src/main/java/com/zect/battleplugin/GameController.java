@@ -25,7 +25,8 @@ public class GameController extends JavaPlugin implements Listener {
                                      Map<String, String> TeamName,
                                      Map<String, Location> TeamRes,
                                      Map<String, Location> Beacon,
-                                     Integer ticketLimit) {
+                                     Integer ticketLimit,
+                                     Integer BeaconLimit) {
         // 使うであろう変数を用意
         Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
         Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
@@ -36,7 +37,7 @@ public class GameController extends JavaPlugin implements Listener {
         Location Beacon2 = Beacon.get("Team2");
 
         // ゲーム開始機構
-        Count("サバイバル戦争");
+        Count("敵のビーコンを破壊しろ！");
         // ゲーム開始
 //         Controll();
     }
@@ -45,7 +46,8 @@ public class GameController extends JavaPlugin implements Listener {
                                  Scoreboard MainBoard,
                                  Map<String, String> TeamName,
                                  Map<String, Location> TeamRes,
-                                 Map<String, Player> King) {
+                                 Map<String, Player> King,
+                                 Integer phase) {
         // 使うであろう変数を用意
         Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
         Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
@@ -56,9 +58,18 @@ public class GameController extends JavaPlugin implements Listener {
         Player King2 = King.get("Team2");
 
         // ゲーム開始機構
-        Count("赤チーム大将:" + Team1.getColor() + King1.getName()
-                + ChatColor.WHITE + "\n青チーム大将:" + Team2.getColor() + King2.getName()
-                + ChatColor.WHITE + "\n大将戦");
+        switch (phase) {
+            case 1:
+                KingCount("大将: " + Team1.getColor() + King1.getName()
+                                + ChatColor.WHITE + "を守れ！",
+                        "大将: " + Team1.getColor() + King1.getName()
+                                + ChatColor.WHITE + "を殺せ！");
+            case 2:
+                KingCount("大将: " + Team2.getColor() + King2.getName()
+                                + ChatColor.WHITE + "を殺せ！",
+                        "大将: " + Team2.getColor() + King2.getName()
+                                + ChatColor.WHITE + "を守れ！");
+        }
         // ゲーム開始
 //         Controll();
     }
@@ -67,7 +78,8 @@ public class GameController extends JavaPlugin implements Listener {
                                    Map<String, String> TeamName,
                                    Map<String, Location> TeamRes,
                                    Map<String, Player> King,
-                                   Integer timeLimit) {
+                                   Integer timeLimit,
+                                   Integer phase) {
         // 使うであろう変数を用意
         Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
         Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
@@ -78,40 +90,81 @@ public class GameController extends JavaPlugin implements Listener {
         Player King2 = King.get("Team2");
 
         // ゲーム開始機構
-        Count("赤チーム大将:" + Team1.getColor() + King1.getName()
-                + ChatColor.WHITE + "\n青チーム大将:" + Team2.getColor() + King2.getName()
-                + ChatColor.WHITE + "\n大将戦");
+        switch (phase) {
+            case 1:
+                KingCount("大将: " + Team1.getColor() + King1.getName()
+                                + ChatColor.WHITE + "を守れ！",
+                        "大将: " + Team1.getColor() + King1.getName()
+                                + ChatColor.WHITE + "を殺せ！");
+            case 2:
+                KingCount("大将: " + Team2.getColor() + King2.getName()
+                                + ChatColor.WHITE + "を殺せ！",
+                        "大将: " + Team2.getColor() + King2.getName()
+                                + ChatColor.WHITE + "を守れ！");
+        }
         // ゲーム開始
 //         Controll();
     }
 
-    public static void Count(String type) {
+    public static void KingCount(String redsub, String bluesub) {
         Collection<Player> players = (Collection<Player>) Bukkit.getOnlinePlayers();
         // titleでカウントダウン
         try {
-            Util.setTitle("開始まで 5秒前", type + "が始まるよ", 100);
+            Util.setTeamTitle("開始まで 5秒前", redsub, bluesub, 100);
             Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTitle("開始まで 4秒前", type + "が始まるよ", 100);
+            Util.setTeamTitle("開始まで 4秒前", redsub, bluesub, 100);
             Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTitle("開始まで 3秒前", type + "が始まるよ", 100);
+            Util.setTeamTitle("開始まで 3秒前", redsub, bluesub, 100);
             Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTitle("開始まで 2秒前", type + "が始まるよ", 100);
+            Util.setTeamTitle("開始まで 2秒前", redsub, bluesub, 100);
             Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTitle("開始まで 1秒前", type + "が始まるよ", 100);
+            Util.setTeamTitle("開始まで 1秒前", redsub, bluesub, 100);
             Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTitle("ゲーム開始！", type, 30);
+            Util.setTitle("ゲーム開始！", "50人マイクラ戦争", 30);
             Util.sendSound(players, Sound.BLOCK_ANVIL_PLACE);
 
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void Count(String subtitle) {
+        Collection<Player> players = (Collection<Player>) Bukkit.getOnlinePlayers();
+        // titleでカウントダウン
+        try {
+            Util.setTitle("開始まで 5秒前", subtitle, 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 4秒前", subtitle, 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 3秒前", subtitle, 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 2秒前", subtitle, 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("開始まで 1秒前", subtitle, 100);
+            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Thread.sleep(1000);
+
+            Util.setTitle("ゲーム開始！", "50人マイクラ戦争", 30);
+            Util.sendSound(players, Sound.BLOCK_ANVIL_PLACE);
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -131,6 +184,7 @@ public class GameController extends JavaPlugin implements Listener {
         }
     }
 }
+
 class People implements Runnable {
     public void run() {
         // 下に表示するやつ

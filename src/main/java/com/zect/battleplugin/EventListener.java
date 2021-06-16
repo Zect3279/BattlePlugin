@@ -1,11 +1,13 @@
 package com.zect.battleplugin;
 
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 
 public class EventListener implements Listener {
 
@@ -52,18 +54,10 @@ public class EventListener implements Listener {
         if (block.getType() != Material.BEACON) {
             return;
         }
-        if (block.getLocation != Beacon1 && block.getLocation != Beacon2) {
-            event.getPlayer().sendMessage("これは壊すビーコンじゃないよ")
-        }
+//        if (block.getLocation() != Beacon1 && block.getLocation() != Beacon2) {
+//            event.getPlayer().sendMessage("これは壊すビーコンじゃないよ");
+//        }
         // ボスバーの処理
-    }
-    @EventHandler
-    public void onMove(PlayerMoveEvent event) {
-        // ゲーム開始待機中は動けない
-        boolean Now = GameController.GamePlaying;
-        if (!Now) {
-            return;
-        }
-        event.setCancelled()
+        event.getPlayer().sendMessage("ビーコン壊したよ");
     }
 }
