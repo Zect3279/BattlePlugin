@@ -58,9 +58,10 @@ public class EventListener implements Listener {
 //        if (block.getLocation() != Beacon1 && block.getLocation() != Beacon2) {
 //            event.getPlayer().sendMessage("これは壊すビーコンじゃないよ");
 //        }
-        // ボスバーの処理
+        // 破壊を無かったことに
+        event.setCancelled(true);
+        
         event.getPlayer().sendMessage("ビーコン壊したよ");
-        Location beaconPlace = block.getLocation();
-        beaconPlace.getBlock().setType(Material.BEACON);
+        // ボスバーの処理
     }
 }
