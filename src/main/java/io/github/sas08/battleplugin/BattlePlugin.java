@@ -1,4 +1,4 @@
-package com.zect.battleplugin;
+package io.github.sas08.battleplugin;
 
 import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;

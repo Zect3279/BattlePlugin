@@ -1,4 +1,4 @@
-package com.zect.battleplugin;
+package io.github.sas08.battleplugin;
 
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;

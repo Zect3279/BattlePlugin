@@ -1,4 +1,4 @@
-package com.zect.battleplugin;
+package io.github.sas08.battleplugin;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
