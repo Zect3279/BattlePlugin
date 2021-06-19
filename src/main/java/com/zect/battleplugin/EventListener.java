@@ -1,6 +1,5 @@
 package com.zect.battleplugin;
 
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -9,8 +8,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 public class EventListener implements Listener {
+
 
     // プレイヤーが死んだらインスタントが呼び出される
     @EventHandler
@@ -45,6 +46,7 @@ public class EventListener implements Listener {
          * 『TP完了』
          */
     }
+    Integer BrokenCounter = 0;
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
 //        boolean Now = GameController.GamePlaying;
@@ -55,13 +57,25 @@ public class EventListener implements Listener {
         if (block.getType() != Material.BEACON) {
             return;
         }
+
 //        if (block.getLocation() != Beacon1 && block.getLocation() != Beacon2) {
 //            event.getPlayer().sendMessage("これは壊すビーコンじゃないよ");
 //        }
+
+        event.getPlayer().sendMessage("ビーコン壊したよ");
         // 破壊を無かったことに
         event.setCancelled(true);
-        
-        event.getPlayer().sendMessage("ビーコン壊したよ");
+
+        // カウンター処理
+        BrokenCounter += 1;
+        String Counter = String.valueOf(BrokenCounter);
+        event.getPlayer().sendTitle(Counter, "");
+
         // ボスバーの処理
+    }
+    @EventHandler
+    public void onMove(PlayerMoveEvent event) {
+        return;
+//        event.setCancelled(true);
     }
 }
