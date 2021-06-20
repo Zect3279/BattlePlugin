@@ -1,6 +1,7 @@
 package io.github.sas08.battleplugin;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -43,6 +44,24 @@ public class Util {
         players.forEach(player -> {
             if (player != null) {
                 player.playSound(player.getLocation(),sound,0.1f,1);
+            }
+        });
+    }
+    // 一斉TP
+    public static void TeamTeleport(Location redLocation, Location blueLocation) {
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            Server server = Bukkit.getServer();
+            Scoreboard score = server.getScoreboardManager().getMainScoreboard();
+            Team team = score.getPlayerTeam(player);
+            switch (team.getName()) {
+                case "Red":
+                    player.teleport(redLocation);
+                    break;
+                case "Blue":
+                    player.teleport(blueLocation);
+                    break;
+                default:
+                    break;
             }
         });
     }

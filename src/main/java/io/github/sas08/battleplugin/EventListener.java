@@ -49,10 +49,10 @@ public class EventListener implements Listener {
     Integer BrokenCounter = 0;
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-//        boolean Now = GameController.GamePlaying;
-//        if (!Now) {
-//            return;
-//        }
+        boolean Now = GameController.GamePlaying;
+        if (!Now) {
+            return;
+        }
         Block block = event.getBlock();
         if (block.getType() != Material.BEACON) {
             return;

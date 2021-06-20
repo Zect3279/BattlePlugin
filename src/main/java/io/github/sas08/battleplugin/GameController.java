@@ -34,11 +34,25 @@ public class GameController extends JavaPlugin implements Listener {
         Location Beacon2 = Beacon.get("Team2");
 
         // ビーコンの設置
-        // バリアブロックでの隔離
-        World world = Beacon1.getWorld();
-        Location loc = new Location(world, Beacon1.getX(), Beacon1.getX(), Beacon1.getZ());
-        loc.getBlock().setType(Material.BEACON);
+        PlaceBeacon(Beacon1);
+        PlaceBeacon(Beacon2);
 
+        // バリアブロックでの隔離準備
+        PlaceBarrier(Spawn1, "red");
+        PlaceBarrier(Spawn2, "blue");
+
+        // 赤チームテレポート先
+        int yRed = Spawn1.getBlockY();
+        Location RedWait = Spawn1;
+        RedWait.setY(yRed+2);
+
+        // 青チームテレポート先
+        int yBlue = Spawn2.getBlockY();
+        Location BlueWait = Spawn2;
+        BlueWait.setY(yBlue+2);
+
+        // 参加者全員隔離する
+        Util.TeamTeleport(RedWait, BlueWait);
 
         // カウントダウン
         Count("敵のビーコンを破壊しろ！");
@@ -185,6 +199,72 @@ public class GameController extends JavaPlugin implements Listener {
 
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+
+    }
+
+    public static void PlaceBeacon(Location location) {
+        int x = location.getBlockX();
+        int y = location.getBlockY() - 1;
+        int z = location.getBlockZ();
+
+        World world = location.getWorld();
+
+        for (int xPoint = x-1; xPoint <= x+1 ; xPoint++) {
+            for (int zPoint = z-1 ; zPoint <= z+1; zPoint++) {
+                world.getBlockAt(xPoint, y, zPoint).setType(Material.BEDROCK);
+                world.getBlockAt(xPoint, y-1, zPoint).setType(Material.IRON_BLOCK);
+                world.getBlockAt(xPoint, y-2, zPoint).setType(Material.BEDROCK);
+            }
+        }
+        for (int xPoint = x-1; xPoint <= x+1; xPoint++) {
+            world.getBlockAt(xPoint, y-1, z-2).setType(Material.BEDROCK);
+            world.getBlockAt(xPoint, y-1, z+2).setType(Material.BEDROCK);
+        }
+        for (int zPoint = z-1; zPoint <= z+1; zPoint++) {
+            world.getBlockAt(x-2, y-1, zPoint).setType(Material.BEDROCK);
+            world.getBlockAt(x+2, y-1, zPoint).setType(Material.BEDROCK);
+        }
+        world.getBlockAt(x, y, z).setType(Material.BEACON);
+    }
+
+    public static void PlaceBarrier(Location location, String type) {
+
+        World world = location.getWorld();
+
+        // バリアブロック設置
+        int x = location.getBlockX();
+        int y = location.getBlockY() + 1;
+        int z = location.getBlockZ();
+        world.getBlockAt(x, y, z).setType(Material.BARRIER);
+        for (int yPoint = y+1; yPoint <= y+3; yPoint++) {
+            world.getBlockAt(x-1, yPoint, z).setType(Material.BARRIER);
+            world.getBlockAt(x+1, yPoint, z).setType(Material.BARRIER);
+            world.getBlockAt(x, yPoint, z+1).setType(Material.BARRIER);
+            world.getBlockAt(x, yPoint, z-1).setType(Material.BARRIER);
+        }
+
+        // コンクリート設置
+        int X = location.getBlockX();
+        int Y = location.getBlockY() - 1;
+        int Z = location.getBlockZ();
+        world.getBlockAt(X-1, Y, Z).setType(Material.BEDROCK);
+        world.getBlockAt(X+1, Y, Z).setType(Material.BEDROCK);
+        world.getBlockAt(X, Y, Z+1).setType(Material.BEDROCK);
+        world.getBlockAt(X, Y, Z-1).setType(Material.BEDROCK);
+        world.getBlockAt(X, Y-1, Z).setType(Material.BEDROCK);
+
+        switch (type) {
+            case "red":
+                world.getBlockAt(x, y+4, z).setType(Material.RED_CONCRETE);
+                world.getBlockAt(X, Y, Z).setType(Material.RED_CONCRETE);
+                break;
+            case "blue":
+                world.getBlockAt(x, y+4, z).setType(Material.BLUE_CONCRETE);
+                world.getBlockAt(X, Y, Z).setType(Material.BLUE_CONCRETE);
+                break;
+            default:
+                break;
         }
 
     }

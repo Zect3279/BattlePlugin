@@ -1,6 +1,6 @@
 name: BattlePlugin
 version: ${project.version}
-main: com.zect.battleplugin.BattlePlugin
+main: io.github.sas08.battleplugin.BattlePlugin
 depend: [ CommandAPI ]
 api-version: 1.16
 authors: [ Zect ]
