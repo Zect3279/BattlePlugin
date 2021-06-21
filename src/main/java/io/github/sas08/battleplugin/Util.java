@@ -39,6 +39,12 @@ public class Util {
             player.sendActionBar(message);
         });
     }
+    // 一斉送信
+    public static void sendAll(String message) {
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            player.sendMessage(message);
+        });
+    }
     // 音送信
     public static void sendSound(Collection<Player> players, Sound sound) {
         players.forEach(player -> {
