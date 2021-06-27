@@ -1,10 +1,10 @@
 package io.github.sas08.battleplugin;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.Sound;
+import org.bukkit.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -71,5 +71,43 @@ public class Util {
             }
         });
     }
+
+    public static void giveLeather() {
+        ItemStack RedLeather = createLeather(Material.LEATHER_CHESTPLATE, Color.RED);
+        ItemStack BlueLeather = createLeather(Material.LEATHER_CHESTPLATE, Color.BLUE);
+        Server server = Bukkit.getServer();
+        Scoreboard score = server.getScoreboardManager().getMainScoreboard();
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            Team team = score.getPlayerTeam(player);
+            switch (team.getName()) {
+                case "Red":
+                    player.getInventory().setChestplate(RedLeather);
+                    break;
+                case "Blue":
+                    player.getInventory().setChestplate(BlueLeather);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
+    public static void giveItem(ItemStack item, Integer many, Integer index) {
+        item.setAmount(many);
+        Bukkit.getOnlinePlayers().forEach(player ->  {
+            player.getInventory().setItem(index, item);
+        });
+
+    }
+
+    public static ItemStack createLeather(Material leatherPiece, Color color) {
+        ItemStack item = new ItemStack(leatherPiece);
+        LeatherArmorMeta meta = (LeatherArmorMeta) item.getItemMeta();
+        meta.setColor(Color.fromRGB(color.asRGB()));
+        meta.addEnchant(Enchantment.BINDING_CURSE, 1, true);
+        item.setItemMeta(meta);
+        return item;
+    }
+
 
 }

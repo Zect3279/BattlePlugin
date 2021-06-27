@@ -9,6 +9,7 @@ import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -100,7 +101,22 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .withArguments(new LocationArgument("SpawnPoint"))
                         .executes(this::PlaceBarrier)
                 )
+                .withSubcommand(new CommandAPICommand("item")
+                        .executes(this::GiveLeather)
+                )
                 .register();
+    }
+
+    private void GiveLeather(CommandSender sender, Object[] args) {
+        ItemStack meat = new ItemStack(Material.COOKED_BEEF);
+        ItemStack sword = new ItemStack(Material.STONE_SWORD);
+        ItemStack bow = new ItemStack(Material.BOW);
+        ItemStack arrow = new ItemStack(Material.ARROW);
+        Util.giveLeather();
+        Util.giveItem(meat, 64, 0);
+        Util.giveItem(sword, 1, 1);
+        Util.giveItem(bow, 1, 2);
+        Util.giveItem(arrow, 64, 3);
     }
 
     private void PlaceBarrier(CommandSender sender, Object[] args) {

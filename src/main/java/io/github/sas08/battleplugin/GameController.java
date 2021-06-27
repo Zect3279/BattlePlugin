@@ -4,6 +4,7 @@ import net.md_5.bungee.api.ChatColor;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -59,6 +60,7 @@ public class GameController extends JavaPlugin implements Listener {
 
         // 服配布
         //
+        Util.giveLeather();
 
         // ゲーム開始
 //         Controll();
@@ -95,8 +97,16 @@ public class GameController extends JavaPlugin implements Listener {
                 break;
             default:
                 break;
-
         }
+        ItemStack meat = new ItemStack(Material.COOKED_BEEF);
+        ItemStack sword = new ItemStack(Material.STONE_SWORD);
+        ItemStack bow = new ItemStack(Material.BOW);
+        ItemStack arrow = new ItemStack(Material.ARROW);
+        Util.giveLeather();
+        Util.giveItem(meat, 64, 0);
+        Util.giveItem(sword, 1, 1);
+        Util.giveItem(bow, 1, 2);
+        Util.giveItem(arrow, 64, 3);
         // ゲーム開始
 //         Controll();
     }
@@ -133,6 +143,15 @@ public class GameController extends JavaPlugin implements Listener {
             default:
                 break;
         }
+        ItemStack meat = new ItemStack(Material.COOKED_BEEF);
+        ItemStack sword = new ItemStack(Material.STONE_SWORD);
+        ItemStack bow = new ItemStack(Material.BOW);
+        ItemStack arrow = new ItemStack(Material.ARROW);
+        Util.giveLeather();
+        Util.giveItem(meat, 64, 0);
+        Util.giveItem(sword, 1, 1);
+        Util.giveItem(bow, 1, 2);
+        Util.giveItem(arrow, 64, 3);
         // ゲーム開始
 //         Controll();
     }
