@@ -308,7 +308,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         // チームカラーを取得して、その色で
         // [0 - 0]
         // みたいに表示する
-        Random random = new Random();
+        // 残り人数も表示する
         // チーム作成
         MakeTeams(sender);
 
@@ -329,43 +329,26 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             Team team1 = score.getTeam(TeamName.get("Team1"));
             Team team2 = score.getTeam(TeamName.get("Team2"));
             Collection<? extends Player> players = server.getOnlinePlayers();
+            Integer index = 0;
 
             for (Player player : players) {
-                Integer num = random.nextInt(2);
-                Team team = score.getPlayerTeam(player);
-                if (team == null) {
-                    if (num == 0) {
+                switch (index % 2) {
+                    case 0:
                         team1.addPlayer(player);
-                    } else if (num == 1) {
+                        index += 1;
+                        break;
+                    case 1:
                         team2.addPlayer(player);
-                    } else {
-                        return;
-                    }
-                } else {
-                    if (team.getName() == TeamName.get("Team1") || team.getName() == TeamName.get("Team2") || team.getName() == TeamName.get("Team3")) {
-                        return;
-                    } else if (Team1 == null || Team2 == null) {
-                        return;
-                    } else {
-                        if (team.getName() == TeamName.get("Team1")) {
-                            team1.removePlayer(player);
-                        }
-                        if (team.getName() == TeamName.get("Team2")) {
-                            team2.removePlayer(player);
-                        }
-
-                        if (num == 0) {
-                            team1.addPlayer(player);
-                        } else if (num == 1) {
-                            team2.addPlayer(player);
-                        } else {
-                            return;
-                        }
-                    }
+                        index += 1;
+                        break;
+                    default:
+                        break;
                 }
                 size1 = String.valueOf(team1.getSize());
                 size2 = String.valueOf(team2.getSize());
-                Util.setTitle(team1.getColor() + size1 + ChatColor.WHITE + " - " + team2.getColor() + size2, "チーム分け中", 100);
+                String Remainers = players.size() - index
+                String remainers = Remainers.toString();
+                Util.setTitle(team1.getColor() + size1 + ChatColor.WHITE + " - " + team2.getColor() + size2, "チーム分け中\n残り:" + remainers, 100);
             }
             Thread.sleep(200);
 
