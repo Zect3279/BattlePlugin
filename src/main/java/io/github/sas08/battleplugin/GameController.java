@@ -33,6 +33,7 @@ public class GameController extends JavaPlugin implements Listener {
         Location Spawn2 = TeamRes.get("Team2");
         Location Beacon1 = Beacon.get("Team1");
         Location Beacon2 = Beacon.get("Team2");
+        
 
         // ビーコンの設置
         PlaceBeacon(Beacon1);
@@ -81,6 +82,11 @@ public class GameController extends JavaPlugin implements Listener {
         Player King1 = King.get("Team1");
         Player King2 = King.get("Team2");
 
+        
+        // バリアブロックでの隔離準備
+        PlaceBarrier(Spawn1, "red");
+        PlaceBarrier(Spawn2, "blue");
+        
         // ゲーム開始機構
         switch (phase) {
             case 1:
@@ -98,6 +104,7 @@ public class GameController extends JavaPlugin implements Listener {
             default:
                 break;
         }
+        
         ItemStack meat = new ItemStack(Material.COOKED_BEEF);
         ItemStack sword = new ItemStack(Material.STONE_SWORD);
         ItemStack bow = new ItemStack(Material.BOW);
@@ -107,6 +114,7 @@ public class GameController extends JavaPlugin implements Listener {
         Util.giveItem(sword, 1, 1);
         Util.giveItem(bow, 1, 2);
         Util.giveItem(arrow, 64, 3);
+        
         // ゲーム開始
 //         Controll();
     }
@@ -125,7 +133,12 @@ public class GameController extends JavaPlugin implements Listener {
         Location Spawn2 = TeamRes.get("Team2");
         Player King1 = King.get("Team1");
         Player King2 = King.get("Team2");
-
+        
+        
+        // バリアブロックでの隔離準備
+        PlaceBarrier(Spawn1, "red");
+        PlaceBarrier(Spawn2, "blue");
+        
         // ゲーム開始機構
         switch (phase) {
             case 1:
