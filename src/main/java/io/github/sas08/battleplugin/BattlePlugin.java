@@ -255,7 +255,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         }
     }
     public void TitleCall(CommandSender sender, Object[] args) {
-        Util.setTitle("マイクラ戦争プラグイン", "企画:KUN(?) 制作:Zect 命名:nori", 500);
+        Util.setTitle(Color.GREEN + "マイクラ戦争" + Color.RED + "プラグイン", Color.GREEN + "企画:KUN 制作:Zect", 500);
     }
     public void GameStart(CommandSender sender, Object[] args) {
         // ゲーム開始できるか判定する
