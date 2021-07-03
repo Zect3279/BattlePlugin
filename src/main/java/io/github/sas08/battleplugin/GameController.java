@@ -11,8 +11,8 @@ import org.bukkit.scoreboard.Team;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameController extends JavaPlugin implements Listener {
 
@@ -64,7 +64,7 @@ public class GameController extends JavaPlugin implements Listener {
         Util.giveLeather();
 
         // ゲーム開始
-//         Controll();
+        Control("survival");
     }
 
     public static void KingStart(Server server,
@@ -301,27 +301,46 @@ public class GameController extends JavaPlugin implements Listener {
 
     }
 
-    public void Controll() throws Exception {
+    public static void Control(String type) {
         /*
          * ボーダー処理・殺害処理・勝敗判定
          * の関数を発火
          */
         GamePlaying = true;
-        ExecutorService exec = Executors.newCachedThreadPool();
-        while (true) {
-            exec.submit(new People());
+        Timer timer = new Timer();
+        switch (type) {
+            case "survival":
+                timer.scheduleAtFixedRate(survivalActionBar,0,1000);
+                break;
+            case "king":
+            case "simple":
+                timer.scheduleAtFixedRate(kingActionBar,0,1000);
+                break;
+            default:
+                break;
         }
     }
-}
 
-class People implements Runnable {
-    public void run() {
-        // 下に表示するやつ
-        // 大将戦：<__人が参加中 赤チーム:__ 青チーム:__>
-        // サバイバル：<__人が参加中 赤チーム:__/<チケット数> 青チーム:__/<チケット数>>
-        Util.setActionBar("<人が参加中 赤チーム:人 青チーム:人>\n赤:枚 青:枚");
-        Util.setActionBar("<人が参加中 赤チーム:人 青チーム:人>");
-    }
+    private static final TimerTask survivalActionBar = new TimerTask() {
+        public void run() {
+            // 定期的に実行したい処理
+            Map<String, Integer> mems = Util.PlayerNumber();
+            Integer all = mems.get("All");
+            Integer red = mems.get("Red");
+            Integer blue = mems.get("Bleu");
+            Util.setActionBar("<" + all.toString() + "人が参加中 赤チーム:" + red.toString() + "人 青チーム:" + blue.toString() + "人>\n赤:枚 青:枚");
+        }
+    };
+    private static final TimerTask kingActionBar = new TimerTask() {
+        public void run() {
+            // 定期的に実行したい処理
+            Map<String, Integer> mems = Util.PlayerNumber();
+            Integer all = mems.get("All");
+            Integer red = mems.get("Red");
+            Integer blue = mems.get("Bleu");
+            Util.setActionBar("<" + all.toString() + "人が参加中 赤チーム:" + red.toString() + "人 青チーム:" + blue.toString() + "人>");
+        }
+    };
 }
 
 //public class WinChecker implements Runnable {

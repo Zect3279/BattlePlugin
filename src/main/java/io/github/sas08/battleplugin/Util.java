@@ -9,6 +9,8 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Util {
 
@@ -107,6 +109,32 @@ public class Util {
         meta.addEnchant(Enchantment.BINDING_CURSE, 1, true);
         item.setItemMeta(meta);
         return item;
+    }
+
+    public static Map<String,Integer> PlayerNumber() {
+        Server server = Bukkit.getServer();
+        Scoreboard score = server.getScoreboardManager().getMainScoreboard();
+        Map<String,Integer> members = new HashMap<>();
+        Integer all = Bukkit.getOnlinePlayers().size();
+        final Integer[] red = {0};
+        final Integer[] blue = {0};
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            Team team = score.getPlayerTeam(player);
+            switch (team.getName()) {
+                case "Red":
+                    red[0] += 1;
+                    break;
+                case "Blue":
+                    blue[0] += 1;
+                    break;
+                default:
+                    break;
+            }
+        });
+        members.put("All", all);
+        members.put("Red", red[0]);
+        members.put("Blue", blue[0]);
+        return members;
     }
 
 
