@@ -8,7 +8,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
 
 public class EventListener implements Listener {
 
@@ -72,10 +71,5 @@ public class EventListener implements Listener {
         event.getPlayer().sendTitle(Counter, "");
 
         // ボスバーの処理
-    }
-    @EventHandler
-    public void onMove(PlayerMoveEvent event) {
-        return;
-//        event.setCancelled(true);
     }
 }

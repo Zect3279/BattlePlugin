@@ -9,7 +9,6 @@ import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -93,52 +92,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .withArguments(new StringArgument("Phase"))
                         .executes(this::TestStart)
                 )
-                .withSubcommand(new CommandAPICommand("beacon")
-                        .withArguments(new LocationArgument("Beacon"))
-                        .executes(this::PlaceBeacon)
-                )
-                .withSubcommand(new CommandAPICommand("spawn")
-                        .withArguments(new LocationArgument("SpawnPoint"))
-                        .executes(this::PlaceBarrier)
-                )
-                .withSubcommand(new CommandAPICommand("item")
-                        .executes(this::GiveLeather)
-                )
                 .register();
     }
-
-    private void GiveLeather(CommandSender sender, Object[] args) {
-        ItemStack meat = new ItemStack(Material.COOKED_BEEF);
-        ItemStack sword = new ItemStack(Material.STONE_SWORD);
-        ItemStack bow = new ItemStack(Material.BOW);
-        ItemStack arrow = new ItemStack(Material.ARROW);
-        Util.giveLeather();
-        Util.giveItem(meat, 64, 0);
-        Util.giveItem(sword, 1, 1);
-        Util.giveItem(bow, 1, 2);
-        Util.giveItem(arrow, 64, 3);
-    }
-
-    private void PlaceBarrier(CommandSender sender, Object[] args) {
-        Location spawner = (Location) args[0];
-        GameController.PlaceBarrier(spawner, "red");
-
-    }
-
-    private void PlaceBeacon(CommandSender sender, Object[] args) {
-        Location beacon = (Location) args[0];
-        GameController.PlaceBeacon(beacon);
-    }
-
-//    private void StopPlayer(CommandSender sender, Object[] objects) {
-//        Server server = getServer();
-//        Collection<? extends Player> players = server.getOnlinePlayers();
-//
-//        for (Player player : players) {
-//            player.setCancelled(true);
-//        }
-//    }
-
 
     private void toCount(CommandSender sender, Object[] args) {
         GameController.Count("マイクラ戦争が始まるよ");
@@ -346,7 +301,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 }
                 size1 = String.valueOf(team1.getSize());
                 size2 = String.valueOf(team2.getSize());
-                String Remainers = players.size() - index
+                Integer Remainers = players.size() - index;
                 String remainers = Remainers.toString();
                 Util.setTitle(team1.getColor() + size1 + ChatColor.WHITE + " - " + team2.getColor() + size2, "チーム分け中\n残り:" + remainers, 100);
             }
