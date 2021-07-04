@@ -92,6 +92,12 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .withArguments(new StringArgument("Phase"))
                         .executes(this::TestStart)
                 )
+                .withSubcommand(new CommandAPICommand("gamerule")
+                        .withSubcommand(new CommandApiCommand("SpectaterAfterDeath")
+                                .withArguments(new BoolArgument("bool"))
+                        )
+                        .executes(this::SpecAfterDeath)
+                )
                 .register();
     }
 
