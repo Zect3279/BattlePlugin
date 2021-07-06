@@ -1,5 +1,6 @@
 # BattlePlugin
 **50人戦争支援プラグイン**
+Javaを勉強しながら作成しているため、遅い
 
 ## usage
 - /siege start -> 開始
