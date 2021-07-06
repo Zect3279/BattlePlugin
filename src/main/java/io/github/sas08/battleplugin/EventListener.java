@@ -1,5 +1,6 @@
 package io.github.sas08.battleplugin;
 
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -26,6 +27,15 @@ public class EventListener implements Listener {
         if (event.getEntity().getKiller() instanceof Player) {
             // 殺した人の処理
         }
+    }
+    @EventHandler
+    public void makeSpec(PlayerDeathEvent event) {
+        Boolean Spec = BattlePlugin.DoSpectator;
+        if (!Spec) {
+            return;
+        }
+        Player player = event.getEntity();
+        player.setGameMode(GameMode.SPECTATOR);
     }
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {

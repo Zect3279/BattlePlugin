@@ -33,9 +33,9 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         );
 
         // ゲームルールのアーギュメントリスト
-        List<Argument> gameruleArgument = new ArrayList<>();
+        List<Argument> gamemodeArgument = new ArrayList<>();
         String[] ruleList = new String[] {"survival", "simple", "king"};
-        gameruleArgument.add(new StringArgument("Rule").overrideSuggestions(ruleList));
+        gamemodeArgument.add(new StringArgument("Rule").overrideSuggestions(ruleList));
 
         // コマンドを設定する
         new CommandAPICommand("siege")
@@ -59,9 +59,15 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .withArguments(new PlayerArgument("target"))
                         .executes(this::SetKings)
                 )
-                .withSubcommand(new CommandAPICommand("GameRule")
-                        .withArguments(gameruleArgument)
+                .withSubcommand(new CommandAPICommand("gamemode")
+                        .withArguments(gamemodeArgument)
                         .executes(this::SetGameRule)
+                )
+                .withSubcommand(new CommandAPICommand("gamerule")
+                        .withSubcommand(new CommandAPICommand("SpectatorAfterDeath")
+                                .withArguments(new BooleanArgument("Bool"))
+                                .executes(this::SpecAfterDeath)
+                        )
                 )
                 .withSubcommand(new CommandAPICommand("Respawn")
                         .withArguments(teamArgument)
@@ -88,17 +94,15 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .executes(this::GiveTeam)
                 )
                 .withSubcommand(new CommandAPICommand("start")
-                        .withArguments(gameruleArgument)
+                        .withArguments(gamemodeArgument)
                         .withArguments(new StringArgument("Phase"))
                         .executes(this::TestStart)
                 )
-                .withSubcommand(new CommandAPICommand("gamerule")
-                        .withSubcommand(new CommandApiCommand("SpectaterAfterDeath")
-                                .withArguments(new BoolArgument("bool"))
-                        )
-                        .executes(this::SpecAfterDeath)
-                )
                 .register();
+    }
+
+    private void SpecAfterDeath(CommandSender sender, Object[] args) {
+        DoSpectator = (Boolean) args[0];
     }
 
     private void toCount(CommandSender sender, Object[] args) {
@@ -164,15 +168,19 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     Map<String, Player> King = new HashMap<>();
 
     // デフォルトの秒数を300秒に
-    public Integer timeLimit = 300;
+    Integer timeLimit = 300;
 
     // デフォルトのチケット数を200に
-    public Integer ticketLimit = 200;
+    Integer ticketLimit = 200;
 
     // デフォルトのビーコン数を20に
-    public Integer beaconLimit = 20;
+    Integer beaconLimit = 20;
 
+    // 処理に使うためのゲームタイプを用意
     String gameType = null;
+
+    // 死んだらスペクテーターにするかの設定
+    static Boolean DoSpectator = false;
 
 
     private void SetKings(CommandSender sender, Object[] args) {
@@ -216,7 +224,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         }
     }
     public void TitleCall(CommandSender sender, Object[] args) {
-        Util.setTitle(Color.GREEN + "マイクラ戦争" + Color.RED + "プラグイン", Color.GREEN + "企画:KUN 制作:Zect", 500);
+        Util.setTitle(ChatColor.GREEN + "マイクラ戦争" + ChatColor.RED + "プラグイン", ChatColor.GREEN + "制作:Zect", 500);
     }
     public void GameStart(CommandSender sender, Object[] args) {
         // ゲーム開始できるか判定する
@@ -724,6 +732,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     public void Simota(CommandSender sender, Object[] args) {
         if (TeamName.get("Team1") == null || TeamName.get("Team2") == null) {
             sender.sendMessage("チームが設定できてないよ");
+            return;
         }
 
         Server server = sender.getServer();
