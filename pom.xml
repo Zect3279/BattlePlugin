@@ -6,7 +6,7 @@
 
     <groupId>io.github.sas08</groupId>
     <artifactId>BattlePlugin</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.0</version>
     <packaging>jar</packaging>
 
     <name>BattlePlugin</name>
