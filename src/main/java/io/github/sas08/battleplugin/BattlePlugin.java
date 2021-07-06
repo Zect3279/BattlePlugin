@@ -98,7 +98,16 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .withArguments(new StringArgument("Phase"))
                         .executes(this::TestStart)
                 )
+                .withSubcommand(new CommandAPICommand("seeActionBar")
+                        .withArguments(gamemodeArgument)
+                        .executes(this::toAction)
+                )
                 .register();
+    }
+
+    private void toAction(CommandSender sender, Object[] args) {
+        String type = (String) args[0];
+        GameController.Control(type);
     }
 
     private void SpecAfterDeath(CommandSender sender, Object[] args) {

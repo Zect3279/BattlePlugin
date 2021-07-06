@@ -301,20 +301,22 @@ public class GameController extends JavaPlugin implements Listener {
 
     }
 
+    static Timer SctionTask = new Timer();
+
     public static void Control(String type) {
         /*
          * ボーダー処理・殺害処理・勝敗判定
          * の関数を発火
          */
         GamePlaying = true;
-        Timer timer = new Timer();
+
         switch (type) {
             case "survival":
-                timer.scheduleAtFixedRate(survivalActionBar,0,1000);
+                SctionTask.scheduleAtFixedRate(survivalActionBar,0,1000);
                 break;
             case "king":
             case "simple":
-                timer.scheduleAtFixedRate(kingActionBar,0,1000);
+                SctionTask.scheduleAtFixedRate(kingActionBar,0,1000);
                 break;
             default:
                 break;
@@ -328,7 +330,10 @@ public class GameController extends JavaPlugin implements Listener {
             Integer all = mems.get("All");
             Integer red = mems.get("Red");
             Integer blue = mems.get("Bleu");
-            Util.setActionBar("<" + all.toString() + "人が参加中 赤チーム:" + red.toString() + "人 青チーム:" + blue.toString() + "人>\n赤:枚 青:枚");
+            Util.setActionBar("こんにちは");
+
+            SctionTask.cancel();
+//            Util.setActionBar("<" + all.toString() + "人が参加中 赤チーム:" + red.toString() + "人 青チーム:" + blue.toString() + "人>\n赤:枚 青:枚");
         }
     };
     private static final TimerTask kingActionBar = new TimerTask() {
