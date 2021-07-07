@@ -38,6 +38,18 @@ public class EventListener implements Listener {
         player.setGameMode(GameMode.SPECTATOR);
     }
     @EventHandler
+    public void beaconCoter(PlaerDeathEvent event) {
+        Boolean Now = GameController.GamePlaying;
+        if (!Now) {
+            return;
+        }
+        String rule = Util.GameType;
+        if (rule != "survival") {
+            return;
+        }
+        // ビーコン処理
+    }
+    @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         // 攻城戦中に入ってくたら、攻城戦に強制参加
         // チームに参加していなかったら、人数が少ない方のチームに入れる
