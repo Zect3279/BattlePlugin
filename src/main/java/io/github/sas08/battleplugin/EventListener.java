@@ -47,7 +47,8 @@ public class EventListener implements Listener {
         if (rule != "survival") {
             return;
         }
-        // ビーコン処理
+        // チケット処理
+        Util.ticketCounter(event);
     }
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
