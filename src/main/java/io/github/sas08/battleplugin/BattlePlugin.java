@@ -360,6 +360,10 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         team1.setColor(org.bukkit.ChatColor.RED);
         team2.setColor(org.bukkit.ChatColor.BLUE);
         team3.setColor(org.bukkit.ChatColor.AQUA);
+        
+        team1.allowFriendlyFire(false);
+        team2.allowFriendlyFire(false);
+        team3.allowFriendlyFire(false);
 
         // チーム名を追加
         // 1,2は戦闘、3は観覧
