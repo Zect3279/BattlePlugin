@@ -55,6 +55,9 @@ public class GameController extends JavaPlugin implements Listener {
 
         // 参加者全員隔離する
         Util.TeamTeleport(RedWait, BlueWait);
+        
+        // ゲームモードとかを設定
+        GameSet();
 
         // カウントダウン
         Count("敵のビーコンを破壊しろ！");
@@ -168,7 +171,12 @@ public class GameController extends JavaPlugin implements Listener {
         // ゲーム開始
 //         Controll();
     }
-
+    
+    public static void GameSet() {
+        // spec
+        // HP full
+    }
+    
     public static void KingCount(String redsub, String bluesub) {
         Collection<Player> players = (Collection<Player>) Bukkit.getOnlinePlayers();
         // titleでカウントダウン
