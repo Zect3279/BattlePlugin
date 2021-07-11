@@ -309,7 +309,7 @@ public class GameController extends JavaPlugin implements Listener {
 
     }
 
-    static Timer SctionTask = new Timer();
+    static Timer ActionTask = new Timer();
 
     public static void Control(String type) {
         /*
@@ -320,11 +320,11 @@ public class GameController extends JavaPlugin implements Listener {
 
         switch (type) {
             case "survival":
-                SctionTask.scheduleAtFixedRate(survivalActionBar,0,1000);
+                ActionTask.scheduleAtFixedRate(survivalActionBar,0,1000);
                 break;
             case "king":
             case "simple":
-                SctionTask.scheduleAtFixedRate(kingActionBar,0,1000);
+                ActionTask.scheduleAtFixedRate(kingActionBar,0,1000);
                 break;
             default:
                 break;
@@ -340,7 +340,7 @@ public class GameController extends JavaPlugin implements Listener {
             Integer blue = mems.get("Bleu");
             Util.setActionBar("こんにちは");
 
-            SctionTask.cancel();
+            ActionTask.cancel();
 //            Util.setActionBar("<" + all.toString() + "人が参加中 赤チーム:" + red.toString() + "人 青チーム:" + blue.toString() + "人>\n赤:枚 青:枚");
         }
     };
