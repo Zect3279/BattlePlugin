@@ -116,24 +116,24 @@ public class Util {
         Scoreboard score = server.getScoreboardManager().getMainScoreboard();
         Map<String,Integer> members = new HashMap<>();
         Integer all = Bukkit.getOnlinePlayers().size();
-        final Integer[] red = {0};
-        final Integer[] blue = {0};
+        Integer red = 0;
+        Integer blue = 0;
         Bukkit.getOnlinePlayers().forEach(player -> {
             Team team = score.getPlayerTeam(player);
             switch (team.getName()) {
                 case "Red":
-                    red[0] += 1;
+                    red++;
                     break;
                 case "Blue":
-                    blue[0] += 1;
+                    blue++;
                     break;
                 default:
                     break;
             }
         });
         members.put("All", all);
-        members.put("Red", red[0]);
-        members.put("Blue", blue[0]);
+        members.put("Red", red);
+        members.put("Blue", blue);
         return members;
     }
 
