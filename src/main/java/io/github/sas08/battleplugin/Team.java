@@ -9,15 +9,31 @@ public class ConfigTeam<T> {
     private final Integer time;
   
   
-    public ConfigTeam(String TeamName, Location RespawnPoint, Location BeaconPoint, Integer MaxTicket, Player King, Integer MaxTime) {
+    public ConfigTeam(String TeamName) {
         this.name = TeamName;
-        this.respawn = RespawnPoint;
-        this.beacon = BeaconPoint;
-        this.ticket = MaxTicket;
-        this.king = King;
-        this.time = MaxTime
     }
     
+
+    public setRespawn(Position Respawn) {
+        this.respawn = Respawn;
+    }
+
+    public setBeacon(Position Beacon) {
+        this.beacon = Beacon;
+    }
+
+    public setMaxTicket(Integer MacTicket) {
+        this.ticket = MaxTicket;
+    }
+
+    public setKing(Player King) {
+        this.king = King;
+    }
+
+    public setTime(Integer MaxTime) {
+        this.time = MaxTime;
+    }
+
   
     public String getName() {
         return name;
