@@ -30,7 +30,7 @@ public class EventListener implements Listener {
     }
     @EventHandler
     public void makeSpec(PlayerDeathEvent event) {
-        Boolean Spec = BattlePlugin.DoSpectator;
+        Boolean Spec = BattlePlugin.system.getSpec();
         if (!Spec) {
             return;
         }

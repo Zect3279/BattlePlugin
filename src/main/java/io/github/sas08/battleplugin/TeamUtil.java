@@ -1,6 +1,7 @@
 package io.github.sas08.battleplugin;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
@@ -9,18 +10,37 @@ import org.bukkit.scoreboard.Team;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConfigTeam<T> {
-  
+public class TeamUtil {
+
+    // チーム名
     private final String name;
+
+    // チーム色
+    private final ChatColor color;
+
+    // リスポーン地点
     private Location respawn;
+
+    // ビーコン地点
     private Location beacon;
-    private Integer tickets;
+
+    // ビーコン数
+    private Integer beaconNum = 20;
+
+    // チケット数
+    private Integer tickets = 200;
+
+    // 大将
     private Player king;
-    private Integer times;
-  
-  
-    public ConfigTeam(String TeamName) {
+
+
+    // Coと一般を分ける
+    private boolean op;
+
+
+    public TeamUtil(String TeamName, ChatColor Color) {
         this.name = TeamName;
+        this.color = Color;
     }
     
 
@@ -32,6 +52,10 @@ public class ConfigTeam<T> {
         this.beacon = Beacon;
     }
 
+    public void setBeaconNum(Integer MaxBeaconHP) {
+        this.beaconNum = MaxBeaconHP;
+    }
+
     public void setMaxTicket(Integer MaxTicket) {
         this.tickets = MaxTicket;
     }
@@ -40,13 +64,17 @@ public class ConfigTeam<T> {
         this.king = King;
     }
 
-    public void setTimes(Integer MaxTime) {
-        this.times = MaxTime;
+    public void setOp(boolean Op) {
+        this.op = Op;
     }
 
-  
+
     public String getName() {
         return name;
+    }
+
+    public ChatColor getColor() {
+        return color;
     }
   
     public Location getRespawn() {
@@ -55,6 +83,10 @@ public class ConfigTeam<T> {
   
     public Location getBeacon() {
         return beacon;
+    }
+
+    public Integer getBeaconNum() {
+        return beaconNum;
     }
   
     public Integer getTicket() {
@@ -65,10 +97,11 @@ public class ConfigTeam<T> {
         return king;
     }
 
-    public Integer getTimes() {
-        return times;
+    public boolean getOp() {
+        return op;
     }
-  
+
+
     public void lostTicket() {
         tickets--;
     }
@@ -86,5 +119,4 @@ public class ConfigTeam<T> {
     }
 
 
-    // 毎秒timeをへらす機構
 }

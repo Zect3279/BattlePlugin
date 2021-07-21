@@ -111,7 +111,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     }
 
     private void SpecAfterDeath(CommandSender sender, Object[] args) {
-        DoSpectator = (Boolean) args[0];
+        system.DoSpectator = (Boolean) args[0];
     }
 
     private void toCount(CommandSender sender, Object[] args) {
@@ -164,33 +164,10 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         // Plugin shutdown logic
     }
 
-    // リスポーン地点を保存
-    Map<String, Location> TeamRes = new HashMap<>();
+    // チーム情報を作成
+    Map<String, TeamUtil> Teams = new HashMap<>();
 
-    // <Team, Team.getName()> チーム番号と名前を保存
-    Map<String, String> TeamName = new HashMap<>();
-
-    // ビーコンの位置を設定（サバイバルのみ使用）
-    Map<String, Location> Beacon = new HashMap<>();
-
-    // 大将
-    Map<String, Player> King = new HashMap<>();
-
-    // デフォルトの秒数を300秒に
-    Integer timeLimit = 300;
-
-    // デフォルトのチケット数を200に
-    Integer ticketLimit = 200;
-
-    // デフォルトのビーコン数を20に
-    Integer beaconLimit = 20;
-
-    // 処理に使うためのゲームタイプを用意
-    String gameType = null;
-
-    // 死んだらスペクテーターにするかの設定
-    static Boolean DoSpectator = false;
-
+    static SystemUtil system = new SystemUtil();
 
     private void SetKings(CommandSender sender, Object[] args) {
         // Kingを追加
@@ -202,10 +179,10 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         if (team == null) {
             sender.sendMessage("チームに所属してないよ");
         } else if (team.getName() == "Red") {
-            King.put("Team1", king);
+            Teams.get("Team1").setKing(king);
             sender.sendMessage("[" + king.getName() + "]" + "を赤チームの大将を決定した");
         } else if (team.getName() == "Blue") {
-            King.put("Team2", king);
+            Teams.get("Team2").setKing(king);
             sender.sendMessage("[" + king.getName() + "]" + "を青チームの大将を決定した");
         }
 
@@ -217,15 +194,15 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         switch (rule) {
             case "survival":
                 sender.sendMessage("サバイバル戦\n・時間制限なし\n・チケット0で終了\n・ビーコン有り");
-                gameType = "survival";
+                system.setType("survival");
                 break;
             case "king":
                 sender.sendMessage("大将戦\n・時間制限なし\n・大将を殺して終了");
-                gameType = "king";
+                system.setType("king");
                 break;
             case "simple":
                 sender.sendMessage("シンプル戦\n・時間制限有り\n・大将を殺して終了");
-                gameType = "simple";
+                system.setType("simple");
                 break;
             default:
                 sender.sendMessage("エラーが発生");
@@ -266,15 +243,15 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         * - [x] サーバーobj
         */
         Integer phase = (Integer) args[0];
-        switch (gameType) {
+        switch (system.getType()) {
             case "survival":
-                GameController.SurvivalStart(server, MainBoard, TeamName, TeamRes, Beacon, ticketLimit, beaconLimit);
+                GameController.SurvivalStart(Teams, server, MainBoard);
                 break;
             case "king":
-                GameController.KingStart(server, MainBoard, TeamName, TeamRes, King, phase);
+                GameController.KingStart(Teams, server, MainBoard, phase);
                 break;
             case "simple":
-                GameController.SimpleStart(server, MainBoard, TeamName, TeamRes, King, timeLimit, phase);
+                GameController.SimpleStart(Teams, server, MainBoard, phase);
                 break;
             default:
                 sender.sendMessage("エラーが発生");
@@ -293,8 +270,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         Server server = sender.getServer();
         Scoreboard score = server.getScoreboardManager().getMainScoreboard();
 
-        String Team1 = TeamName.get("Team1");
-        String Team2 = TeamName.get("Team2");
+        TeamUtil Team1 = Teams.get("Team1");
+        TeamUtil Team2 = Teams.get("Team2");
 
         String size1 = "0";
         String size2 = "0";
@@ -304,8 +281,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
             Thread.sleep(200);
 
-            Team team1 = score.getTeam(TeamName.get("Team1"));
-            Team team2 = score.getTeam(TeamName.get("Team2"));
+            Team team1 = score.getTeam(Teams.get("Team1").getName());
+            Team team2 = score.getTeam(Teams.get("Team2").getName());
             Collection<? extends Player> players = server.getOnlinePlayers();
             Integer index = 0;
 
@@ -367,9 +344,9 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
         // チーム名を追加
         // 1,2は戦闘、3は観覧
-        TeamName.put("Team1", team1.getName());
-        TeamName.put("Team2", team2.getName());
-        TeamName.put("Team3", team3.getName());
+        Teams.put("Team1", new TeamUtil("Red", org.bukkit.ChatColor.RED));
+        Teams.put("Team2", new TeamUtil("Blue", org.bukkit.ChatColor.BLUE));
+        Teams.put("Team3", new TeamUtil("Co", org.bukkit.ChatColor.AQUA));
 
     }
     public String CheckCanPlay() {
@@ -384,16 +361,18 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         */
         String cantStart = "";
         Integer can = 0;
+        TeamUtil team1 = Teams.get("Team1");
+        TeamUtil team2 = Teams.get("Team2");
         
         // 開始条件のどれか一つでも無かったら、開始できない
-        switch (gameType) {
+        switch (system.getType()) {
             case "survival":
 //                sender.sendMessage("サバイバル戦\n・時間制限なし\n・チケット0で終了\n・ビーコン有り");
-                if (Beacon.get("Team1") == null || Beacon.get("Team2") == null) {
+                if (team1.getBeacon() == null || team2.getBeacon() == null) {
                     cantStart += "\n- ビーコンの場所が指定されてない";
                     can += 1;
                 }
-                if (TeamRes.get("Team1") == null || TeamRes.get("Team2") == null) {
+                if (team1.getRespawn() == null || team2.getRespawn() == null) {
                     cantStart += "\n- リスポーン地点が指定されていない";
                     can += 1;
                 }
@@ -403,11 +382,11 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             case "simple":
 //                sender.sendMessage("大将戦\n・時間制限なし\n・大将を殺して終了");
 //                sender.sendMessage("シンプル戦\n・時間制限有り\n・大将を殺して終了");
-                if (King.get("Team1") == null || King.get("Team2") == null) {
+                if (team1.getKing() == null || team2.getKing() == null) {
                     cantStart += "\n- 大将が指定できてない";
                     can += 1;
                 }
-                if (TeamRes.get("Team1") == null || TeamRes.get("Team2") == null) {
+                if (team1.getRespawn() == null || team2.getRespawn() == null) {
                     cantStart += "\n- リスポーン地点が指定されていない";
                     can += 1;
                 }
@@ -424,13 +403,13 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     }
     public void SetTimeLimit(CommandSender sender, Object[] args) {
         // 時間制限を追加
-        Integer before = timeLimit;
-        timeLimit = (Integer) args[0];
+        Integer before = system.getTimes();
+        system.setTimes((Integer) args[0]);
         sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
                 + ChatColor.GREEN + "攻城戦の制限時間を\n"
                 + ChatColor.YELLOW + "[" + before + "]"
                 + ChatColor.GREEN + "から"
-                + ChatColor.YELLOW + "[" + timeLimit + "]\n"
+                + ChatColor.YELLOW + "[" + system.getTimes() + "]\n"
                 + ChatColor.GREEN + "に設定しました。"
         );
     }
@@ -440,18 +419,18 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         Server server = sender.getServer();
         Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
 
-        String Team1N = TeamName.get("Team1");
-        String Team2N = TeamName.get("Team2");
+        TeamUtil team1 = Teams.get("Team1");
+        TeamUtil team2 = Teams.get("Team2");
         String FighterName = Fighter.getName();
         Location fighterRes = (Location) args[1];
 
-        if (!FighterName.equals(Team1N) && !FighterName.equals(Team2N)) {
+        if (!FighterName.equals(team1.getName()) && !FighterName.equals(team2.getName())) {
             sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
                     + ChatColor.RED + "指定されたチームは、戦闘チームに設定されていません。\n"
                     + "チーム名を確認して、もう一度試してください。"
             );
-        } else if (FighterName.equals(Team1N)) {
-            TeamRes.put("Team1", fighterRes);
+        } else if (FighterName.equals(team1.getName())) {
+            team1.setRespawn(fighterRes);
             // 設定したリスポーン地点の座標をx,y,zに保存
             Integer x = fighterRes.getBlockX();
             Integer y = fighterRes.getBlockY();
@@ -474,8 +453,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                     + ChatColor.GREEN + "のリス地を設定しました。\n以下のブロックから設定場所にTPできます。"
             );
             sender.sendMessage(TP1);
-        } else if (FighterName.equals(Team2N)) {
-            TeamRes.put("Team2", fighterRes);
+        } else if (FighterName.equals(team2.getName())) {
+            team2.setRespawn(fighterRes);
             Integer x = fighterRes.getBlockX();
             Integer y = fighterRes.getBlockY();
             Integer z = fighterRes.getBlockZ();
@@ -509,18 +488,18 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         Server server = sender.getServer();
         Team Fighter = server.getScoreboardManager().getMainScoreboard().getTeam(fighter);
 
-        String Team1N = TeamName.get("Team1");
-        String Team2N = TeamName.get("Team2");
+        TeamUtil team1 = Teams.get("Team1");
+        TeamUtil team2 = Teams.get("Team2");
         String FighterName = Fighter.getName();
         Location fighterBea = (Location) args[1];
 
-        if (!FighterName.equals(Team1N) && !FighterName.equals(Team2N)) {
+        if (!FighterName.equals(team1.getName()) && !FighterName.equals(team2.getName())) {
             sender.sendMessage(ChatColor.AQUA + "[攻城戦支援プラグイン]\n"
                     + ChatColor.RED + "指定されたチームは、戦闘チームに設定されていません。\n"
                     + "チーム名を確認して、もう一度試してください。"
             );
-        } else if (FighterName.equals(Team1N)) {
-            Beacon.put("Team1", fighterBea);
+        } else if (FighterName.equals(team1.getName())) {
+            team1.setBeacon(fighterBea);
             // 設定したリスポーン地点の座標をx,y,zに保存
             Integer x = fighterBea.getBlockX();
             Integer y = fighterBea.getBlockY();
@@ -543,8 +522,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                     + ChatColor.GREEN + "のビーコンを設定しました。\n以下のブロックから設定場所にTPできます。"
             );
             sender.sendMessage(TP1);
-        } else if (FighterName.equals(Team2N)) {
-            Beacon.put("Team2", fighterBea);
+        } else if (FighterName.equals(team2.getName())) {
+            team2.setBeacon(fighterBea);
             Integer x = fighterBea.getBlockX();
             Integer y = fighterBea.getBlockY();
             Integer z = fighterBea.getBlockZ();
@@ -577,15 +556,17 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         // チーム1のリス地へTP
         // チーム2のリス地へTP
         // ゲームスタートボタン
+        TeamUtil team1 = Teams.get("Team1");
+        TeamUtil team2 = Teams.get("Team2");
         Integer cannot = 0;
-        switch (gameType) {
+        switch (system.getType()) {
             case "survival":
 //                sender.sendMessage("サバイバル戦\n・時間制限なし\n・チケット0で終了\n・ビーコン有り");
-                if (Beacon.get("Team1") == null || Beacon.get("Team2") == null) {
+                if (team1.getBeacon() == null || team2.getBeacon() == null) {
                     sender.sendMessage("ビーコンの場所が指定されてない");
                     cannot += 1;
                 }
-                if (TeamRes.get("Team1") == null || TeamRes.get("Team2") == null) {
+                if (team1.getRespawn() == null || team2.getRespawn() == null) {
                     sender.sendMessage("リスポーン地点が指定されていない");
                     cannot += 1;
                 }
@@ -595,11 +576,11 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             case "simple":
 //                sender.sendMessage("大将戦\n・時間制限なし\n・大将を殺して終了");
 //                sender.sendMessage("シンプル戦\n・時間制限有り\n・大将を殺して終了");
-                if (King.get("Team1") == null || King.get("Team2") == null) {
+                if (team1.getKing() == null || team2.getKing() == null) {
                     sender.sendMessage("大将が指定できてない");
                     cannot += 1;
                 }
-                if (TeamRes.get("Team1") == null || TeamRes.get("Team2") == null) {
+                if (team1.getRespawn() == null || team2.getRespawn() == null) {
                     sender.sendMessage("リスポーン地点が指定されていない");
                     cannot += 1;
                 }
@@ -633,7 +614,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             sender.sendMessage(GetTeam(sender));
             sender.sendMessage(GetRes1(sender));
             sender.sendMessage(GetRes2(sender));
-            switch (gameType) {
+            switch (system.getType()) {
                 case "survival":
                     sender.sendMessage(GetBea1(sender));
                     sender.sendMessage(GetBea2(sender));
@@ -665,8 +646,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         // チームのリストを返す
         BaseComponent[] KingList = new ComponentBuilder(
                 new TextComponent(new ComponentBuilder()
-                        .append("\n- 赤チーム : " + King.get("Team1").getName()
-                                + "\n- 青チーム : " + King.get("Team2").getName()
+                        .append("\n- 赤チーム : " + Teams.get("Team1").getKing().getName()
+                                + "\n- 青チーム : " + Teams.get("Team2").getKing().getName()
                         ).color(ChatColor.GREEN)
                         .create()
                 )
@@ -674,7 +655,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         return KingList;
     }
     public BaseComponent[] GetRes1(CommandSender sender) {
-        Location Spawn1 = TeamRes.get("Team1");
+        Location Spawn1 = Teams.get("Team1").getRespawn();
         String spa1 = Spawn1.getBlockX() + " " + Spawn1.getBlockY() + " " + Spawn1.getBlockZ();
 
         BaseComponent[] TPRes1 = new ComponentBuilder(
@@ -692,7 +673,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         return TPRes1;
     }
     public BaseComponent[] GetRes2(CommandSender sender) {
-        Location Spawn2 = TeamRes.get("Team2");
+        Location Spawn2 = Teams.get("Team2").getRespawn();
         String spa2 = Spawn2.getBlockX() + " " + Spawn2.getBlockY() + " " + Spawn2.getBlockZ();
 
         BaseComponent[] TPRes2 = new ComponentBuilder(
@@ -709,7 +690,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         return TPRes2;
     }
     public BaseComponent[] GetBea1(CommandSender sender) {
-        Location Beacon1 = Beacon.get("Team1");
+        Location Beacon1 = Teams.get("Team1").getBeacon();
         String bea1 = Beacon1.getBlockX() + " " + Beacon1.getBlockY() + " " + Beacon1.getBlockZ();
 
         BaseComponent[] TPBea1 = new ComponentBuilder(
@@ -726,7 +707,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         return TPBea1;
     }
     public BaseComponent[] GetBea2(CommandSender sender) {
-        Location Beacon2 = Beacon.get("Team2");
+        Location Beacon2 = Teams.get("Team2").getBeacon();
         String bea2 = Beacon2.getBlockX() + " " + Beacon2.getBlockY() + " " + Beacon2.getBlockZ();
 
         BaseComponent[] TPBea2 = new ComponentBuilder(
@@ -743,7 +724,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         return TPBea2;
     }
     public void Simota(CommandSender sender, Object[] args) {
-        if (TeamName.get("Team1") == null || TeamName.get("Team2") == null) {
+        if (Teams.get("Team1") == null || Teams.get("Team2") == null) {
             sender.sendMessage("チームが設定できてないよ");
             return;
         }
@@ -757,9 +738,9 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
         Integer num = random.nextInt(2);
             if (num == 0) {
-                team = MainBoard.getTeam(TeamName.get("Team1"));
+                team = MainBoard.getTeam(Teams.get("Team1").getName());
             } else if (num == 1) {
-                team = MainBoard.getTeam(TeamName.get("Team2"));
+                team = MainBoard.getTeam(Teams.get("Team2").getName());
             } else {
                 return;
             }

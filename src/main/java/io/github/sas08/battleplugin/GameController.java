@@ -7,7 +7,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 
 import java.util.Collection;
 import java.util.Map;
@@ -18,21 +17,17 @@ public class GameController extends JavaPlugin implements Listener {
 
     public static boolean GamePlaying = false;
 
-    public static void SurvivalStart(Server server,
-                                     Scoreboard MainBoard,
-                                     Map<String, String> TeamName,
-                                     Map<String, Location> TeamRes,
-                                     Map<String, Location> Beacon,
-                                     Integer ticketLimit,
-                                     Integer BeaconLimit) {
+    public static void SurvivalStart(Map<String, TeamUtil> Teams,
+                                     Server server,
+                                     Scoreboard MainBoard) {
         // 使うであろう変数を用意
-        Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
-        Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
-        Team Team3 = MainBoard.getTeam(TeamName.get("Team3"));
-        Location Spawn1 = TeamRes.get("Team1");
-        Location Spawn2 = TeamRes.get("Team2");
-        Location Beacon1 = Beacon.get("Team1");
-        Location Beacon2 = Beacon.get("Team2");
+        TeamUtil team1 = Teams.get("Team1");
+        TeamUtil team2 = Teams.get("Team2");
+        TeamUtil team3 = Teams.get("Team3");
+        Location Spawn1 = team1.getRespawn();
+        Location Spawn2 = team2.getRespawn();
+        Location Beacon1 = team1.getBeacon();
+        Location Beacon2 = team2.getBeacon();
         
 
         // ビーコンの設置
@@ -70,20 +65,18 @@ public class GameController extends JavaPlugin implements Listener {
         Control("survival");
     }
 
-    public static void KingStart(Server server,
+    public static void KingStart(Map<String, TeamUtil> Teams,
+                                 Server server,
                                  Scoreboard MainBoard,
-                                 Map<String, String> TeamName,
-                                 Map<String, Location> TeamRes,
-                                 Map<String, Player> King,
                                  Integer phase) {
         // 使うであろう変数を用意
-        Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
-        Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
-        Team Team3 = MainBoard.getTeam(TeamName.get("Team3"));
-        Location Spawn1 = TeamRes.get("Team1");
-        Location Spawn2 = TeamRes.get("Team2");
-        Player King1 = King.get("Team1");
-        Player King2 = King.get("Team2");
+        TeamUtil team1 = Teams.get("Team1");
+        TeamUtil team2 = Teams.get("Team2");
+        TeamUtil team3 = Teams.get("Team3");
+        Location Spawn1 = team1.getRespawn();
+        Location Spawn2 = team2.getRespawn();
+        Player King1 = team1.getKing();
+        Player King2 = team2.getKing();
 
         
         // バリアブロックでの隔離準備
@@ -93,15 +86,15 @@ public class GameController extends JavaPlugin implements Listener {
         // ゲーム開始機構
         switch (phase) {
             case 1:
-                KingCount("大将: " + Team1.getColor() + King1.getName()
+                KingCount("大将: " + team1.getColor() + King1.getName()
                                 + ChatColor.WHITE + "を守れ！",
-                        "大将: " + Team1.getColor() + King1.getName()
+                        "大将: " + team1.getColor() + King1.getName()
                                 + ChatColor.WHITE + "を殺せ！");
                 break;
             case 2:
-                KingCount("大将: " + Team2.getColor() + King2.getName()
+                KingCount("大将: " + team2.getColor() + King2.getName()
                                 + ChatColor.WHITE + "を殺せ！",
-                        "大将: " + Team2.getColor() + King2.getName()
+                        "大将: " + team2.getColor() + King2.getName()
                                 + ChatColor.WHITE + "を守れ！");
                 break;
             default:
@@ -121,21 +114,18 @@ public class GameController extends JavaPlugin implements Listener {
         // ゲーム開始
 //         Controll();
     }
-    public static void SimpleStart(Server server,
+    public static void SimpleStart(Map<String, TeamUtil> Teams,
+                                   Server server,
                                    Scoreboard MainBoard,
-                                   Map<String, String> TeamName,
-                                   Map<String, Location> TeamRes,
-                                   Map<String, Player> King,
-                                   Integer timeLimit,
                                    Integer phase) {
         // 使うであろう変数を用意
-        Team Team1 = MainBoard.getTeam(TeamName.get("Team1"));
-        Team Team2 = MainBoard.getTeam(TeamName.get("Team2"));
-        Team Team3 = MainBoard.getTeam(TeamName.get("Team3"));
-        Location Spawn1 = TeamRes.get("Team1");
-        Location Spawn2 = TeamRes.get("Team2");
-        Player King1 = King.get("Team1");
-        Player King2 = King.get("Team2");
+        TeamUtil team1 = Teams.get("Team1");
+        TeamUtil team2 = Teams.get("Team2");
+        TeamUtil team3 = Teams.get("Team3");
+        Location Spawn1 = team1.getRespawn();
+        Location Spawn2 = team2.getRespawn();
+        Player King1 = team1.getKing();
+        Player King2 = team2.getKing();
         
         
         // バリアブロックでの隔離準備
@@ -145,15 +135,15 @@ public class GameController extends JavaPlugin implements Listener {
         // ゲーム開始機構
         switch (phase) {
             case 1:
-                KingCount("大将: " + Team1.getColor() + King1.getName()
+                KingCount("大将: " + team1.getColor() + King1.getName()
                                 + ChatColor.WHITE + "を守れ！",
-                        "大将: " + Team1.getColor() + King1.getName()
+                        "大将: " + team1.getColor() + King1.getName()
                                 + ChatColor.WHITE + "を殺せ！");
                 break;
             case 2:
-                KingCount("大将: " + Team2.getColor() + King2.getName()
+                KingCount("大将: " + team2.getColor() + King2.getName()
                                 + ChatColor.WHITE + "を殺せ！",
-                        "大将: " + Team2.getColor() + King2.getName()
+                        "大将: " + team2.getColor() + King2.getName()
                                 + ChatColor.WHITE + "を守れ！");
                 break;
             default:

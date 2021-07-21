@@ -118,19 +118,20 @@ public class Util {
         Integer all = Bukkit.getOnlinePlayers().size();
         Integer red = 0;
         Integer blue = 0;
-//        Bukkit.getOnlinePlayers().forEach(player -> {
-//            Team team = score.getPlayerTeam(player);
-//            switch (team.getName()) {
-//                case "Red":
-//                    red++;
-//                    break;
-//                case "Blue":
-//                    blue++;
-//                    break;
-//                default:
-//                    break;
-//            }
-//        });
+        Collection<? extends Player> players = server.getOnlinePlayers();
+        for (Player player : players) {
+            Team team = score.getPlayerTeam(player);
+            switch (team.getName()) {
+                case "Red":
+                    red++;
+                    break;
+                case "Blue":
+                    blue++;
+                    break;
+                default:
+                    break;
+            }
+        }
         members.put("All", all);
         members.put("Red", red);
         members.put("Blue", blue);
