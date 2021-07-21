@@ -1,12 +1,22 @@
+package io.github.sas08.battleplugin;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigTeam<T> {
   
     private final String name;
-    private final Location respawn;
-    private final Location beacon;
-    private final Integer ticket;
-    private final Player king;
-    private final Integer time;
+    private Location respawn;
+    private Location beacon;
+    private Integer tickets;
+    private Player king;
+    private Integer times;
   
   
     public ConfigTeam(String TeamName) {
@@ -14,24 +24,24 @@ public class ConfigTeam<T> {
     }
     
 
-    public setRespawn(Position Respawn) {
+    public void setRespawn(Location Respawn) {
         this.respawn = Respawn;
     }
 
-    public setBeacon(Position Beacon) {
+    public void setBeacon(Location Beacon) {
         this.beacon = Beacon;
     }
 
-    public setMaxTicket(Integer MacTicket) {
-        this.ticket = MaxTicket;
+    public void setMaxTicket(Integer MaxTicket) {
+        this.tickets = MaxTicket;
     }
 
-    public setKing(Player King) {
+    public void setKing(Player King) {
         this.king = King;
     }
 
-    public setTime(Integer MaxTime) {
-        this.time = MaxTime;
+    public void setTimes(Integer MaxTime) {
+        this.times = MaxTime;
     }
 
   
@@ -48,16 +58,19 @@ public class ConfigTeam<T> {
     }
   
     public Integer getTicket() {
-        return ticket;
+        return tickets;
     }
   
     public Player getKing() {
         return king;
     }
+
+    public Integer getTimes() {
+        return times;
+    }
   
-  
-    public Integer lostTicket() {
-        ticket--;
+    public void lostTicket() {
+        tickets--;
     }
   
     public List<Player> getMember() {
@@ -65,12 +78,13 @@ public class ConfigTeam<T> {
         Scoreboard score = Bukkit.getServer().getScoreboardManager().getMainScoreboard();
         Bukkit.getOnlinePlayers().forEach(player -> {
             Team team = score.getPlayerTeam(player);
-            if (team.getName() == this.getame()) {
+            if (team.getName().equals(this.getName())) {
                 MemberList.add(player);
             }
         });
-        return MemberList
+        return MemberList;
     }
-    
+
+
     // 毎秒timeをへらす機構
 }

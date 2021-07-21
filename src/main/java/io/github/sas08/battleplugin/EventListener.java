@@ -37,19 +37,19 @@ public class EventListener implements Listener {
         Player player = event.getEntity();
         player.setGameMode(GameMode.SPECTATOR);
     }
-    @EventHandler
-    public void beaconCoter(PlaerDeathEvent event) {
-        Boolean Now = GameController.GamePlaying;
-        if (!Now) {
-            return;
-        }
-        String rule = Util.GameType;
-        if (rule != "survival") {
-            return;
-        }
-        // チケット処理
-        Util.ticketCounter(event);
-    }
+//    @EventHandler
+//    public void beaconCoter(PlayerDeathEvent event) {
+//        Boolean Now = GameController.GamePlaying;
+//        if (!Now) {
+//            return;
+//        }
+//        String rule = Util.GameType;
+//        if (rule != "survival") {
+//            return;
+//        }
+//        // チケット処理
+//        Util.ticketCounter(event);
+//    }
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         // 攻城戦中に入ってくたら、攻城戦に強制参加
