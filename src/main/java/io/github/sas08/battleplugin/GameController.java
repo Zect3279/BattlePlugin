@@ -8,19 +8,23 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 public class GameController extends JavaPlugin implements Listener {
 
     public static boolean GamePlaying = false;
 
-    public static void SurvivalStart(Map<String, TeamUtil> Teams,
+    private static Map<String, TeamUtil> Teams;
+
+    private static SystemUtil system;
+
+    public static void SurvivalStart(SystemUtil Systems,
+                                     Map<String, TeamUtil> teams,
                                      Server server,
                                      Scoreboard MainBoard) {
         // 使うであろう変数を用意
+        Teams = teams;
+        system = Systems;
         TeamUtil team1 = Teams.get("Team1");
         TeamUtil team2 = Teams.get("Team2");
         TeamUtil team3 = Teams.get("Team3");
@@ -33,43 +37,36 @@ public class GameController extends JavaPlugin implements Listener {
         // ビーコンの設置
         PlaceBeacon(Beacon1);
         PlaceBeacon(Beacon2);
+        Bukkit.getLogger().info("ビーコン設置");
 
         // バリアブロックでの隔離準備
         PlaceBarrier(Spawn1, "red");
         PlaceBarrier(Spawn2, "blue");
-
-        // 赤チームテレポート先
-        int yRed = Spawn1.getBlockY();
-        Location RedWait = Spawn1;
-        RedWait.setY(yRed+2);
-
-        // 青チームテレポート先
-        int yBlue = Spawn2.getBlockY();
-        Location BlueWait = Spawn2;
-        BlueWait.setY(yBlue+2);
-
-        // 参加者全員隔離する
-        Util.TeamTeleport(RedWait, BlueWait);
-        
-        // ゲームモードとかを設定
-        GameSet();
+        Bukkit.getLogger().info("バリア設置");
 
         // カウントダウン
         Count("敵のビーコンを破壊しろ！");
+        Bukkit.getLogger().info("カウントダウン");
 
-        // 服配布
-        //
-        Util.giveLeather();
+        // ゲームモードとかを設定
+        Util.TeamTeleport(Teams, Spawn1, Spawn2);
+        GameSet();
+        Util.giveLeather(Teams);
+        Bukkit.getLogger().info("アイテム・ゲームモード・TP");
 
         // ゲーム開始
         Control("survival");
+        Bukkit.getLogger().info("アクションバー");
     }
 
-    public static void KingStart(Map<String, TeamUtil> Teams,
+    public static void KingStart(SystemUtil Systems,
+                                 Map<String, TeamUtil> teams,
                                  Server server,
                                  Scoreboard MainBoard,
                                  Integer phase) {
         // 使うであろう変数を用意
+        Teams = teams;
+        system = Systems;
         TeamUtil team1 = Teams.get("Team1");
         TeamUtil team2 = Teams.get("Team2");
         TeamUtil team3 = Teams.get("Team3");
@@ -78,7 +75,7 @@ public class GameController extends JavaPlugin implements Listener {
         Player King1 = team1.getKing();
         Player King2 = team2.getKing();
 
-        
+
         // バリアブロックでの隔離準備
         PlaceBarrier(Spawn1, "red");
         PlaceBarrier(Spawn2, "blue");
@@ -105,7 +102,7 @@ public class GameController extends JavaPlugin implements Listener {
         ItemStack sword = new ItemStack(Material.STONE_SWORD);
         ItemStack bow = new ItemStack(Material.BOW);
         ItemStack arrow = new ItemStack(Material.ARROW);
-        Util.giveLeather();
+        Util.giveLeather(Teams);
         Util.giveItem(meat, 64, 0);
         Util.giveItem(sword, 1, 1);
         Util.giveItem(bow, 1, 2);
@@ -114,11 +111,15 @@ public class GameController extends JavaPlugin implements Listener {
         // ゲーム開始
 //         Controll();
     }
-    public static void SimpleStart(Map<String, TeamUtil> Teams,
+
+    public static void SimpleStart(SystemUtil Systems,
+                                   Map<String, TeamUtil> teams,
                                    Server server,
                                    Scoreboard MainBoard,
                                    Integer phase) {
         // 使うであろう変数を用意
+        Teams = teams;
+        system = Systems;
         TeamUtil team1 = Teams.get("Team1");
         TeamUtil team2 = Teams.get("Team2");
         TeamUtil team3 = Teams.get("Team3");
@@ -153,7 +154,7 @@ public class GameController extends JavaPlugin implements Listener {
         ItemStack sword = new ItemStack(Material.STONE_SWORD);
         ItemStack bow = new ItemStack(Material.BOW);
         ItemStack arrow = new ItemStack(Material.ARROW);
-        Util.giveLeather();
+        Util.giveLeather(Teams);
         Util.giveItem(meat, 64, 0);
         Util.giveItem(sword, 1, 1);
         Util.giveItem(bow, 1, 2);
@@ -165,34 +166,45 @@ public class GameController extends JavaPlugin implements Listener {
     public static void GameSet() {
         // spec
         // HP full
+        Server server = Bukkit.getServer();
+        Scoreboard score = server.getScoreboardManager().getMainScoreboard();
+        Collection<? extends Player> players = server.getOnlinePlayers();
+        for (Player player : players) {
+            if (score.getPlayerTeam(player).getName() == "Co") {
+                player.setGameMode(GameMode.SPECTATOR);
+            } else {
+                player.setGameMode(GameMode.SURVIVAL);
+                player.setHealth(player.getMaxHealth());
+            }
+        }
     }
     
     public static void KingCount(String redsub, String bluesub) {
         Collection<Player> players = (Collection<Player>) Bukkit.getOnlinePlayers();
         // titleでカウントダウン
         try {
-            Util.setTeamTitle("開始まで 5秒前", redsub, bluesub, 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Util.setTeamTitle(Teams, "開始まで 5秒前", redsub, bluesub, 100);
+            Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTeamTitle("開始まで 4秒前", redsub, bluesub, 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Util.setTeamTitle(Teams, "開始まで 4秒前", redsub, bluesub, 100);
+            Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTeamTitle("開始まで 3秒前", redsub, bluesub, 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Util.setTeamTitle(Teams, "開始まで 3秒前", redsub, bluesub, 100);
+            Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTeamTitle("開始まで 2秒前", redsub, bluesub, 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Util.setTeamTitle(Teams, "開始まで 2秒前", redsub, bluesub, 100);
+            Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
-            Util.setTeamTitle("開始まで 1秒前", redsub, bluesub, 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Util.setTeamTitle(Teams, "開始まで 1秒前", redsub, bluesub, 100);
+            Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
             Util.setTitle("ゲーム開始！", "50人マイクラ戦争", 30);
-            Util.sendSound(players, Sound.BLOCK_ANVIL_PLACE);
+            Util.sendSound(Sound.BLOCK_ANVIL_PLACE);
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -205,27 +217,27 @@ public class GameController extends JavaPlugin implements Listener {
         // titleでカウントダウン
         try {
             Util.setTitle("開始まで 5秒前", subtitle, 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
             Util.setTitle("開始まで 4秒前", subtitle, 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
             Util.setTitle("開始まで 3秒前", subtitle, 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
             Util.setTitle("開始まで 2秒前", subtitle, 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
             Util.setTitle("開始まで 1秒前", subtitle, 100);
-            Util.sendSound(players, Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+            Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
             Thread.sleep(1000);
 
             Util.setTitle("ゲーム開始！", "50人マイクラ戦争", 30);
-            Util.sendSound(players, Sound.BLOCK_ANVIL_PLACE);
+            Util.sendSound(Sound.BLOCK_ANVIL_PLACE);
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -262,18 +274,6 @@ public class GameController extends JavaPlugin implements Listener {
 
         World world = location.getWorld();
 
-        // バリアブロック設置
-        int x = location.getBlockX();
-        int y = location.getBlockY() + 1;
-        int z = location.getBlockZ();
-        world.getBlockAt(x, y, z).setType(Material.BARRIER);
-        for (int yPoint = y+1; yPoint <= y+3; yPoint++) {
-            world.getBlockAt(x-1, yPoint, z).setType(Material.BARRIER);
-            world.getBlockAt(x+1, yPoint, z).setType(Material.BARRIER);
-            world.getBlockAt(x, yPoint, z+1).setType(Material.BARRIER);
-            world.getBlockAt(x, yPoint, z-1).setType(Material.BARRIER);
-        }
-
         // コンクリート設置
         int X = location.getBlockX();
         int Y = location.getBlockY() - 1;
@@ -286,11 +286,9 @@ public class GameController extends JavaPlugin implements Listener {
 
         switch (type) {
             case "red":
-                world.getBlockAt(x, y+4, z).setType(Material.RED_CONCRETE);
                 world.getBlockAt(X, Y, Z).setType(Material.RED_CONCRETE);
                 break;
             case "blue":
-                world.getBlockAt(x, y+4, z).setType(Material.BLUE_CONCRETE);
                 world.getBlockAt(X, Y, Z).setType(Material.BLUE_CONCRETE);
                 break;
             default:
@@ -298,6 +296,7 @@ public class GameController extends JavaPlugin implements Listener {
         }
 
     }
+
 
     static Timer ActionTask = new Timer();
 
@@ -307,43 +306,40 @@ public class GameController extends JavaPlugin implements Listener {
          * の関数を発火
          */
         GamePlaying = true;
+        Map<String, String> mems = Util.PlayerNumber(Teams);
+        String all = mems.get("All");
+        String red = mems.get("Red");
+        String blue = mems.get("Bleu");
+
+        if (all == null) {
+            all = "0";
+        } else if (red == null) {
+            red = "0";
+        } else if (blue == null) {
+            blue = "0";
+        }
 
         switch (type) {
             case "survival":
-                ActionTask.scheduleAtFixedRate(survivalActionBar,0,1000);
+                Util.setActionBar("< " + all + "人が参加中 " +
+                                  "赤チーム:" + red + "人 " +
+                                  "青チーム:" + blue + "人>\n" +
+                                  "赤:" + Teams.get("Team1").getTicket() + "枚 " +
+                                  "青:" + Teams.get("Team2").getTicket() + "枚 >");
                 break;
             case "king":
             case "simple":
-                ActionTask.scheduleAtFixedRate(kingActionBar,0,1000);
+                Util.setActionBar("< " + all + "人が参加中 " +
+                                  "赤チーム:" + red + "人 " +
+                                  "青チーム:" + blue + "人 >");
                 break;
             default:
                 break;
         }
+        ActionTask.cancel();
+        Bukkit.getLogger().info("アクションバーキャンセル完了");
     }
 
-    private static final TimerTask survivalActionBar = new TimerTask() {
-        public void run() {
-            // 定期的に実行したい処理
-            Map<String, Integer> mems = Util.PlayerNumber();
-            Integer all = mems.get("All");
-            Integer red = mems.get("Red");
-            Integer blue = mems.get("Bleu");
-            Util.setActionBar("こんにちは");
-
-            ActionTask.cancel();
-//            Util.setActionBar("<" + all.toString() + "人が参加中 赤チーム:" + red.toString() + "人 青チーム:" + blue.toString() + "人>\n赤:枚 青:枚");
-        }
-    };
-    private static final TimerTask kingActionBar = new TimerTask() {
-        public void run() {
-            // 定期的に実行したい処理
-            Map<String, Integer> mems = Util.PlayerNumber();
-            Integer all = mems.get("All");
-            Integer red = mems.get("Red");
-            Integer blue = mems.get("Bleu");
-            Util.setActionBar("<" + all.toString() + "人が参加中 赤チーム:" + red.toString() + "人 青チーム:" + blue.toString() + "人>");
-        }
-    };
 }
 
 //public class WinChecker implements Runnable {

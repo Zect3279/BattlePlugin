@@ -33,7 +33,6 @@ public class TeamUtil {
     // 大将
     private Player king;
 
-
     // Coと一般を分ける
     private boolean op;
 
