@@ -47,6 +47,9 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 .withSubcommand(new CommandAPICommand("title")
                         .executes(this::TitleCall)
                 )
+                .withSubcommand(new CommandAPICommand("nav")
+                        .executes(this::Navigation)
+                )
                 .withSubcommand(new CommandAPICommand("start")
                         .withArguments(new IntegerArgument("Phase"))
                         .executes(this::GameStart)
@@ -109,6 +112,48 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 )
                 .register();
     }
+
+    private void Navigation(CommandSender sender, Object[] args) {
+        Player player = sender.getServer().getPlayer(sender.getName());
+
+        Util.sendMessage(player, ChatColor.GREEN + "ゲーム開始ナビゲーションを開始しました。");
+        Nav.reset();
+
+        player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: チームの作成を行います。");
+        Bukkit.dispatchCommand(sender, "siege team");
+        player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: チーム分けが完了しました。");
+
+        player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: ゲームタイプの設定をします。\n"
+                + "[BattlePlugin.Nav]: 特定のゲームタイプのチャットをクリックしてください。");
+        BaseComponent[] Survival = Util.createBaseComponent("[サバイバル]",
+                "クリックでサバイバル攻城戦を選択",
+                "/siege gamemode survival");
+        BaseComponent[] Simple = Util.createBaseComponent("[シンプル]",
+                "クリックでシンプル攻城戦を選択",
+                "/siege gamemode survival");
+        BaseComponent[] King = Util.createBaseComponent("[大将戦]",
+                "クリックで大将戦を選択",
+                "/siege gamemode survival");
+        player.sendMessage(Survival);
+        player.sendMessage(Simple);
+        player.sendMessage(King);
+
+    }
+
+    public static class Nav {
+        public static Boolean gameType = false;
+        public static Boolean respawnPoint = false;
+        public static Boolean beaconPoint = false;
+        public static Boolean king = false;
+
+        public static void reset() {
+            gameType = false;
+            respawnPoint = false;
+            beaconPoint = false;
+            king = false;
+        }
+    }
+
 
     private void toAction(CommandSender sender, Object[] args) {
         String type = (String) args[0];
