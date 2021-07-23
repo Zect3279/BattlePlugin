@@ -4,9 +4,7 @@ import dev.jorel.commandapi.CommandAPI;
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.*;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Server;
@@ -19,6 +17,8 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.*;
+
+import static java.lang.Thread.sleep;
 
 
 public final class BattlePlugin extends JavaPlugin implements Listener {
@@ -46,9 +46,6 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         new CommandAPICommand("siege")
                 .withSubcommand(new CommandAPICommand("title")
                         .executes(this::TitleCall)
-                )
-                .withSubcommand(new CommandAPICommand("nav")
-                        .executes(this::Navigation)
                 )
                 .withSubcommand(new CommandAPICommand("start")
                         .withArguments(new IntegerArgument("Phase"))
@@ -91,15 +88,15 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .withArguments(new TimeArgument("second"))
                         .executes(this::SetTimeLimit)
                 )
+                .withSubcommand(new CommandAPICommand("team")
+                        .executes(this::GiveTeam)
+                )
                 .register();
 
 
         new CommandAPICommand("test")
                 .withSubcommand(new CommandAPICommand("count")
                         .executes(this::toCount)
-                )
-                .withSubcommand(new CommandAPICommand("team")
-                        .executes(this::GiveTeam)
                 )
                 .withSubcommand(new CommandAPICommand("start")
                         .withArguments(gamemodeArgument)
@@ -109,6 +106,9 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 .withSubcommand(new CommandAPICommand("seeActionBar")
                         .withArguments(gamemodeArgument)
                         .executes(this::toAction)
+                )
+                .withSubcommand(new CommandAPICommand("nav")
+                        .executes(this::Navigation)
                 )
                 .register();
     }
@@ -125,18 +125,68 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
         player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: ゲームタイプの設定をします。\n"
                 + "[BattlePlugin.Nav]: 特定のゲームタイプのチャットをクリックしてください。");
-        BaseComponent[] Survival = Util.createBaseComponent("[サバイバル]",
-                "クリックでサバイバル攻城戦を選択",
-                "/siege gamemode survival");
-        BaseComponent[] Simple = Util.createBaseComponent("[シンプル]",
-                "クリックでシンプル攻城戦を選択",
-                "/siege gamemode survival");
-        BaseComponent[] King = Util.createBaseComponent("[大将戦]",
-                "クリックで大将戦を選択",
-                "/siege gamemode survival");
-        player.sendMessage(Survival);
-        player.sendMessage(Simple);
-        player.sendMessage(King);
+
+        BaseComponent[] component =
+                new ComponentBuilder("[サバイバル]").color(ChatColor.BLUE)
+                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                                .append("クリックでサバイバル攻城戦を選択")
+                                .create()
+                        ))
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/siege gamemode survival"))
+                .append(" ")
+                .append("[シンプル]").color(ChatColor.RED)
+                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                                .append("クリックでシンプル攻城戦を選択")
+                                .create()
+                        ))
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/siege gamemode survival"))
+                .append(" ")
+                .append("[大将戦]").color(ChatColor.GREEN)
+                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                                .append("クリックで大将戦を選択")
+                                .create()
+                        ))
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/siege gamemode survival"))
+                .create();
+
+
+        player.sendMessage(component);
+
+        player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: チームのスポーン・ビーコン地点を設定します");
+
+        BaseComponent[] Red =
+                new ComponentBuilder("[ここをTeam1のリス地に設定]").color(ChatColor.RED)
+                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                                .append("クリックでチーム1のリス地を設定")
+                                .create()
+                        ))
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/siege Respawn Red ~ ~ ~"))
+                .append(" ")
+                .append("[ここをTeam1のビーコンに設定]").color(ChatColor.RED)
+                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                                .append("クリックでチーム1のビーコンを設定")
+                                .create()
+                        ))
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/siege Beacon Red ~ ~ ~"))
+                .create();
+        BaseComponent[] Blue =
+                new ComponentBuilder("[ここをTeam2のリス地に設定]").color(ChatColor.RED)
+                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                                .append("クリックでチーム2のリス地を設定")
+                                .create()
+                        ))
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/siege Respawn Blue ~ ~ ~"))
+                        .append(" ")
+                        .append("[ここをTeam2のビーコンに設定]").color(ChatColor.RED)
+                        .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
+                                .append("クリックでチーム2のビーコンを設定")
+                                .create()
+                        ))
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/siege Beacon Blue ~ ~ ~"))
+                        .create();
+        
+        player.sendMessage(Red);
+        player.sendMessage(Blue);
 
     }
 
@@ -239,6 +289,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     }
 
     public void SetGameRule(CommandSender sender, Object[] args) {
+        Nav.gameType = true;
         String rule = (String) args[0];
         sender.sendMessage(rule);
         switch (rule) {
@@ -329,7 +380,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         try {
             Util.setTitle(size1 + " - " + size2, "チーム分けを開始", 100);
 
-            Thread.sleep(200);
+            sleep(200);
 
             Team team1 = score.getTeam(Teams.get("Team1").getName());
             Team team2 = score.getTeam(Teams.get("Team2").getName());
@@ -355,7 +406,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 String remainers = Remainers.toString();
                 Util.setTitle(team1.getColor() + size1 + ChatColor.WHITE + " - " + team2.getColor() + size2, "チーム分け中\n残り:" + remainers, 100);
             }
-            Thread.sleep(200);
+            sleep(200);
 
             Util.setTitle(team1.getColor() + size1 + ChatColor.WHITE + " - " + team2.getColor() + size2, "チーム分け完了", 100);
 
@@ -491,7 +542,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             // クリックしたらTPする不思議なブロックを生成
             BaseComponent[] TP1 = Util.createBaseComponent("[Team1リス地へTP]",
                                                            "クリックでチーム1のリス地へTP",
-                                                           "/tp " + x + " " + y + " " + z);
+                                                           "/tp " + x + " " + y + " " + z,
+                                                            ChatColor.GOLD);
             Util.sendMessage(player, Fighter.getColor() + "[" + Fighter.getName() + "]\n"
                     + ChatColor.GREEN + "のリス地を設定しました。\n"
                     + "以下のブロックから設定場所にTPできます。");
@@ -503,7 +555,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             Integer z = fighterRes.getBlockZ();
             BaseComponent[] TP2 = Util.createBaseComponent("[Team2リス地へTP]",
                                                            "クリックでチーム2のリス地へTP",
-                                                           "/tp " + x + " " + y + " " + z);
+                                                           "/tp " + x + " " + y + " " + z,
+                    ChatColor.GOLD);
             Util.sendMessage(player, Fighter.getColor() + "[" + Fighter.getName() + "]\n"
                     + ChatColor.GREEN + "のリス地を設定しました。\n"
                     + "以下のブロックから設定場所にTPできます。"
@@ -542,7 +595,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             // クリックしたらTPする不思議なブロックを生成
             BaseComponent[] TP1 = Util.createBaseComponent("[Team1ビーコンへTP]",
                     "クリックでチーム1のビーコンへTP",
-                    "/tp " + x + " " + y + " " + z);
+                    "/tp " + x + " " + y + " " + z,
+                    ChatColor.GOLD);
             Util.sendMessage(player, Fighter.getColor() + "[" + Fighter.getName() + "]\n"
                     + ChatColor.GREEN + "のビーコンを設定しました。\n"
                     + "以下のブロックから設定場所にTPできます。");
@@ -555,7 +609,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
             BaseComponent[] TP2 = Util.createBaseComponent("[Team2ビーコンへTP]",
                     "クリックでチーム2のビーコンへTP",
-                    "/tp " + x + " " + y + " " + z);
+                    "/tp " + x + " " + y + " " + z,
+                    ChatColor.GOLD);
             Util.sendMessage(player, Fighter.getColor() + "[" + Fighter.getName() + "]\n"
                     + ChatColor.GREEN + "のビーコンを設定しました。\n"
                     + "以下のブロックから設定場所にTPできます。");
@@ -616,14 +671,17 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
             if (system.getType() == "survival") {
                 starting = Util.createBaseComponent("[クリックで対戦を開始]",
                         "クリックで攻城戦を開始",
-                        "/siege start 0");
+                        "/siege start 0",
+                        ChatColor.GOLD);
             } else {
                 substarting = Util.createBaseComponent("[クリックでA攻めの対戦を開始]",
                         "クリックで攻城戦を開始",
-                        "/siege start 1");
+                        "/siege start 1",
+                        ChatColor.GOLD);
                 starting = Util.createBaseComponent("[クリックでB攻めの対戦を開始]",
                         "クリックで攻城戦を開始",
-                        "/siege start 2");
+                        "/siege start 2",
+                        ChatColor.GOLD);
                 sender.sendMessage(substarting);
             }
             sender.sendMessage(starting);
@@ -681,7 +739,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
         BaseComponent[] TPRes1 = Util.createBaseComponent("\n- チーム1のリス地 : " + spa1,
                 "クリックでチーム1のリス地へTP",
-                "/tp " + spa1);
+                "/tp " + spa1,
+                ChatColor.GOLD);
         return TPRes1;
     }
     public BaseComponent[] GetRes2() {
@@ -690,7 +749,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
         BaseComponent[] TPRes2 = Util.createBaseComponent("\n- チーム2のリス地 : " + spa2,
                 "クリックでチーム2のリス地へTP",
-                "/tp " + spa2);
+                "/tp " + spa2,
+                ChatColor.GOLD);
         return TPRes2;
     }
     public BaseComponent[] GetBea1() {
@@ -699,7 +759,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
         BaseComponent[] TPBea1 = Util.createBaseComponent("\n- チーム1のビーコン : " + bea1,
                 "クリックでチーム1のビーコンへTP",
-                "/tp " + bea1);
+                "/tp " + bea1,
+                ChatColor.GOLD);
         return TPBea1;
     }
     public BaseComponent[] GetBea2() {
@@ -708,7 +769,8 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
         BaseComponent[] TPBea2 = Util.createBaseComponent("\n- チーム2のビーコン : " + bea2,
                 "クリックでチーム2のビーコンへTP",
-                "/tp " + bea2);
+                "/tp " + bea2,
+                ChatColor.GOLD);
         return TPBea2;
     }
     public void Simota(CommandSender sender, Object[] args) {
@@ -736,28 +798,28 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         try {
             Util.setTitle("開始まで 5秒前", "マイクラ戦争が始まるよ", 100);
             Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
-            Thread.sleep(1000);
+            sleep(1000);
 
             Util.setTitle("開始まで 4秒", "マイクラ戦争が始まるよ", 100);
             Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
-            Thread.sleep(1000);
+            sleep(1000);
 
             Util.setTitle("開始まで 3秒", "マイクラ戦争が始まるよ", 100);
             Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
-            Thread.sleep(1000);
+            sleep(1000);
 
             Util.setTitle("開始まで 2秒", "マイクラ戦争が始まるよ", 100);
             Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
-            Thread.sleep(1000);
+            sleep(1000);
 
             Util.setTitle("開始まで 1秒", "マイクラ戦争が始まるよ", 100);
             Util.sendSound(Sound.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
-            Thread.sleep(1000);
+            sleep(1000);
 
             Util.setTitle("ゲーム開始！", "50人マイクラ戦争", 100);
             Util.sendSound(Sound.BLOCK_ANVIL_PLACE);
 
-            Thread.sleep(700);
+            sleep(700);
             Util.setTitle(team.getColor() + team.getName() + ChatColor.WHITE + "チームの勝利", "ゲーム終了", 150);
             for(Player player : players) {
                 player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_USE,0.1f,1);

@@ -1,5 +1,6 @@
 package io.github.sas08.battleplugin;
 
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
@@ -107,10 +108,10 @@ public class Util {
         return members;
     }
 
-    public static BaseComponent[] createBaseComponent(String MainMsg, String SubMsg, String Command) {
+    public static BaseComponent[] createBaseComponent(String MainMsg, String SubMsg, String Command, ChatColor Color) {
         BaseComponent[] Block = new ComponentBuilder(
                 new TextComponent(new ComponentBuilder()
-                        .append(MainMsg).color(net.md_5.bungee.api.ChatColor.GOLD)
+                        .append(MainMsg).color(Color)
                         .create())
         )
                 .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
@@ -125,6 +126,10 @@ public class Util {
     public static void sendMessage(Player player, String Message) {
         player.sendMessage(net.md_5.bungee.api.ChatColor.AQUA + "[攻城戦支援プラグイン]\n" + Message
         );
+    }
+
+    public static void sendBaseActionBar(Player player, BaseComponent[] message) {
+        player.sendActionBar(message);
     }
 
 
