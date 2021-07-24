@@ -92,7 +92,14 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .executes(this::GiveTeam)
                 )
                 .register();
-
+        
+        new CommandAPICommand("nav")
+                .withSubcommand(new CommandAPICommand("gamemode")
+                        .withArguments(gamemodeArgument)
+                        .executes(this::NavigationGamemodeSetter)
+                        )
+                )
+                .register();
 
         new CommandAPICommand("test")
                 .withSubcommand(new CommandAPICommand("count")
@@ -108,21 +115,33 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .executes(this::toAction)
                 )
                 .withSubcommand(new CommandAPICommand("nav")
-                        .executes(this::Navigation)
+                        .executes(this::NavigationStarter)
                 )
                 .register();
     }
 
-    private void Navigation(CommandSender sender, Object[] args) {
+    private void NavigationStarter(CommandSender sender, Object[] args) {
         Player player = sender.getServer().getPlayer(sender.getName());
 
         Util.sendMessage(player, ChatColor.GREEN + "ゲーム開始ナビゲーションを開始しました。");
         Nav.reset();
 
+        NavigationTeamMaker(sender);
+    }
+    
+    private void NavigationTeamMaker(CommandSender sender) {
+        Player player = sender.getServer().getPlayer(sender.getName());
+        
         player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: チームの作成を行います。");
-        Bukkit.dispatchCommand(sender, "siege team");
+        GiveTeam(sender, 1);
         player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: チーム分けが完了しました。");
 
+        NavigationGamemoder(sender);
+    }
+    
+    private void NAvigationGamemoder(CommandSender sender) {
+        Player player = sender.getServer().getPlayer(sender.getName());
+        
         player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: ゲームタイプの設定をします。\n"
                 + "[BattlePlugin.Nav]: 特定のゲームタイプのチャットをクリックしてください。");
 
@@ -132,26 +151,35 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                                 .append("クリックでサバイバル攻城戦を選択")
                                 .create()
                         ))
-                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/siege gamemode survival"))
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nav gamemode survival"))
                 .append(" ")
                 .append("[シンプル]").color(ChatColor.RED)
                         .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
                                 .append("クリックでシンプル攻城戦を選択")
                                 .create()
                         ))
-                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/siege gamemode survival"))
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nav gamemode survival"))
                 .append(" ")
                 .append("[大将戦]").color(ChatColor.GREEN)
                         .event(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder()
                                 .append("クリックで大将戦を選択")
                                 .create()
                         ))
-                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/siege gamemode survival"))
+                        .event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/nav gamemode survival"))
                 .create();
-
 
         player.sendMessage(component);
 
+    }
+    
+    private void NavigationGamemodeSetter(CommandSender sender, Object[] args) {
+        SetGameRule(sender, args);
+        
+        NavigationRespawnBeaconSetter(sender);
+    }
+    
+    private void NavigationRespawnBeaconSetter(CommandSender sender) {
+        
         player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: チームのスポーン・ビーコン地点を設定します");
 
         BaseComponent[] Red =
