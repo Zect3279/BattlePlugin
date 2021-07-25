@@ -31,5 +31,7 @@ Javaを勉強しながら作成しているため、遅い
 - 大将戦と同じ
 
 ## 開始するためのコマンド
-1. /siege gamemode <mode(survival/simple/king)>
-2. /siege Respawn <Position(~ ~ ~)>
+1. /siege nav
+
+## 使用ライブラリ
+- CommandAPI Copyright (c) 2020 Jorel Ali https://github.com/JorelAli/CommandAPI/blob/master/LICENSE
