@@ -222,21 +222,6 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
     }
 
-    public static class Nav {
-        public static Boolean gameType = false;
-        public static Boolean respawnPoint = false;
-        public static Boolean beaconPoint = false;
-        public static Boolean king = false;
-
-        public static void reset() {
-            gameType = false;
-            respawnPoint = false;
-            beaconPoint = false;
-            king = false;
-        }
-    }
-
-
     private void SetTicket(CommandSender sender, Objecy[] args) {
         Integer ticket = (Integer) args[0];
         system.ticket = ticket;
