@@ -84,9 +84,13 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                         .withArguments(new LocationArgument("BeaconPosition"))
                         .executes(this::BeaconPosition)
                 )
-                .withSubcommand(new CommandAPICommand("SetTimeLimit")
+                .withSubcommand(new CommandAPICommand("setTimeLimit")
                         .withArguments(new TimeArgument("second"))
                         .executes(this::SetTimeLimit)
+                )
+                .withSubcommand(new CommandAPICommand("setTicket")
+                        .withArguments(new TimeArgument("Ticket"))
+                        .executes(this::SetTicket)
                 )
                 .withSubcommand(new CommandAPICommand("team")
                         .executes(this::GiveTeam)
@@ -233,6 +237,11 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     }
 
 
+    private void SetTicket(CommandSender sender, Objecy[] args) {
+        Integer ticket = (Integer) args[0];
+        system.ticket = ticket;
+    }
+    
     private void toAction(CommandSender sender, Object[] args) {
         String type = (String) args[0];
         GameController.Control(type);
