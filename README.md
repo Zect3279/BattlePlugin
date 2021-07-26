@@ -3,11 +3,19 @@
 Javaを勉強しながら作成しているため、遅い
 
 ## usage
-- /siege start -> 開始
+### 推奨コマンド
+- /siege nav -> ゲーム開始までのナビゲーション（開始までの設定を手伝います）
+  
+### 全ゲーム共通設定
+- /siege gamemode -> ゲームの種類を指定
+- /siege Respawn <Team> <Location> -> 指定したチームのリスポーン地点を設定
+  
+### サバイバルのみ使用
+- /siege Beacon <Team> <Location> -> 指定したチームのビーコン地点を設定
+- /siege setTicket <Team> <Location> -> 指定したチームのチケット最大数を設定
 
-## コマンド詳細
-### start
-- ゲームを開始する
+### 大将戦のみ使用
+- /siege setTimeLimit <Integer> -> ゲームの制限時間を設定
 
 ## モード
 ### サバイバル (survival)
@@ -29,9 +37,6 @@ Javaを勉強しながら作成しているため、遅い
 
 ### シンプル (simple)
 - 大将戦と同じ
-
-## 開始するためのコマンド
-1. /siege nav
 
 ## 使用ライブラリ
 - CommandAPI Copyright (c) 2020 Jorel Ali https://github.com/JorelAli/CommandAPI/blob/master/LICENSE
