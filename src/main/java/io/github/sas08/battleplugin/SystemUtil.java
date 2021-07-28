@@ -14,9 +14,6 @@ public class SystemUtil<T> {
 
     // 制限時間
     private Integer times;
-    
-    // チケット上限
-    private Integer ticket;
 
 
     public void setTimes(Integer MaxTime) {
@@ -30,10 +27,6 @@ public class SystemUtil<T> {
     public void setType(String GameType) {
         this.gameType = GameType;
     }
-
-    public void setTicket(Integer MaxTicket) {
-        this.ticket = MaxTicket;
-    }
     
 
     public Integer getTimes() {
@@ -46,10 +39,6 @@ public class SystemUtil<T> {
 
     public String getType() {
         return gameType;
-    }
-    
-    public Integer getTicket() {
-        return ticket;
     }
 
 
