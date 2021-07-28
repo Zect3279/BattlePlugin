@@ -39,6 +39,11 @@ public class EventListener implements Listener {
         Player player = event.getEntity();
         player.setGameMode(GameMode.SPECTATOR);
     }
+    @EventHandler
+    public void onRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        // 所属チームのチケットをへらす機構
+    }
 //    @EventHandler
 //    public void beaconCoter(PlayerDeathEvent event) {
 //        Boolean Now = GameController.GamePlaying;
