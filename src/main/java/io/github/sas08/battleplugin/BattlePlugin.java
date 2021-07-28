@@ -223,8 +223,14 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     }
 
     private void SetTicket(CommandSender sender, Objecy[] args) {
+        Player player = sender.getPlayer();
         Integer ticket = (Integer) args[0];
-        system.ticket = ticket;
+        TeamUtil Team1 = Teams.get("Team1");
+        TeamUtil Team2 = Teams.get("Team2");
+        Integer ticket1 = Team1.getTicket();
+        Team1.setMaxTicket(ticket);
+        Team2.setMaxTicket(ticket);
+        Util.sendMessage(player, "チケットの枚数を <" + ticket1 + "> から\n<" + ticket + "> へと変更しました")
     }
     
     private void toAction(CommandSender sender, Object[] args) {
