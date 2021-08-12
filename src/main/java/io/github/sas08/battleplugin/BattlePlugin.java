@@ -5,13 +5,11 @@ import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -36,6 +34,13 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         teamArgument.add(new TeamArgument("team").safeOverrideSuggestions(s ->
             Bukkit.getScoreboardManager().getMainScoreboard().getTeams().toArray(new Team[0]))
         );
+
+        // チーム一覧をコマンド入力時に出力するための変数
+        List<Argument> teamPlayerArgument = new ArrayList<>();
+        teamPlayerArgument.add(new PlayerArgument("target"));
+        String[] teamList = new String[] {"Team-Red", "Team-Blue"};
+        teamPlayerArgument.add(new StringArgument("target").overrideSuggestions(teamList));
+
 
         // ゲームルールのアーギュメントリスト
         List<Argument> gamemodeArgument = new ArrayList<>();
@@ -101,7 +106,6 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 .withSubcommand(new CommandAPICommand("gamemode")
                         .withArguments(gamemodeArgument)
                         .executes(this::NavigationGamemodeSetter)
-                        )
                 )
                 .register();
 
@@ -121,14 +125,39 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
                 .withSubcommand(new CommandAPICommand("nav")
                         .executes(this::NavigationStarter)
                 )
+                .withSubcommand(new CommandAPICommand("give")
+                        .withArguments(teamPlayerArgument)
+                        .executesPlayer(this::giveSome)
+                )
                 .register();
+    }
+
+    private void giveSome(Player player, Object[] args) {
+        ItemStack item = new ItemStack(Material.WOODEN_SWORD);
+        if (args[0] instanceof Player) {
+            Player target = (Player) args[0];
+            target.getInventory().setItem(0, item);
+        } else if (args[0] instanceof String) {
+            String teamName = (String) args[0];
+            List<Player> members = null;
+
+            if (teamName == "Red") {
+                members = Teams.get("Team1").getMember();
+            } else if (teamName == "Blue") {
+                members = Teams.get("Team2").getMember();
+            }
+            assert members != null;
+            for (Player p : members) {
+                p.getInventory().setItem(0, item);
+            }
+        }
+
     }
 
     private void NavigationStarter(CommandSender sender, Object[] args) {
         Player player = sender.getServer().getPlayer(sender.getName());
 
         Util.sendMessage(player, ChatColor.GREEN + "ゲーム開始ナビゲーションを開始しました。");
-        Nav.reset();
 
         NavigationTeamMaker(sender);
     }
@@ -137,13 +166,14 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         Player player = sender.getServer().getPlayer(sender.getName());
         
         player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: チームの作成を行います。");
-        GiveTeam(sender, 1);
+        Object[] obj = new Object[0];
+        GiveTeam(sender, obj);
         player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: チーム分けが完了しました。");
 
         NavigationGamemoder(sender);
     }
     
-    private void NAvigationGamemoder(CommandSender sender) {
+    private void NavigationGamemoder(CommandSender sender) {
         Player player = sender.getServer().getPlayer(sender.getName());
         
         player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: ゲームタイプの設定をします。\n"
@@ -183,6 +213,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     }
     
     private void NavigationRespawnBeaconSetter(CommandSender sender) {
+        Player player = sender.getServer().getPlayer(sender.getName());
         
         player.sendMessage(ChatColor.GREEN + "[BattlePlugin.Nav]: チームのスポーン・ビーコン地点を設定します");
 
@@ -222,15 +253,15 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
 
     }
 
-    private void SetTicket(CommandSender sender, Objecy[] args) {
-        Player player = sender.getPlayer();
+    private void SetTicket(CommandSender sender, Object[] args) {
+        Player player = sender.getServer().getPlayer(sender.getName());
         Integer ticket = (Integer) args[0];
         TeamUtil Team1 = Teams.get("Team1");
         TeamUtil Team2 = Teams.get("Team2");
         Integer ticket1 = Team1.getTicket();
         Team1.setMaxTicket(ticket);
         Team2.setMaxTicket(ticket);
-        Util.sendMessage(player, "チケットの枚数を <" + ticket1 + "> から\n<" + ticket + "> へと変更しました")
+        Util.sendMessage(player, "チケットの枚数を <" + ticket1 + "> から\n<" + ticket + "> へと変更しました");
     }
     
     private void toAction(CommandSender sender, Object[] args) {
@@ -317,7 +348,6 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
     }
 
     public void SetGameRule(CommandSender sender, Object[] args) {
-        Nav.gameType = true;
         String rule = (String) args[0];
         sender.sendMessage(rule);
         switch (rule) {
@@ -388,6 +418,7 @@ public final class BattlePlugin extends JavaPlugin implements Listener {
         }
     }
     public void GiveTeam(CommandSender sender, Object[] args) {
+        getLogger().info("起動");
         // チームに所属させる
         // チームカラーを取得して、その色で
         // [0 - 0]
