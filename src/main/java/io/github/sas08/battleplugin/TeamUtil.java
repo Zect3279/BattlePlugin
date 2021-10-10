@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -11,6 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TeamUtil {
+
+    private static class ItemData {
+        // 最後にのったブロックをメモっておく
+        private ItemStack item;
+        private Integer amount ;
+
+        ItemData(ItemStack itemData, Integer number) {
+            item = itemData;
+            amount = number;
+        }
+    }
 
     // チーム名
     private final String name;
@@ -33,6 +45,9 @@ public class TeamUtil {
     // 大将
     private Player king;
 
+    // 配布アイテムリスト
+    private List<ItemData> items;
+
     // Coと一般を分ける
     private boolean op;
 
@@ -41,7 +56,16 @@ public class TeamUtil {
         this.name = TeamName;
         this.color = Color;
     }
-    
+
+
+    public void addItem(ItemStack item, Integer number) {
+        this.items.add(new ItemData(item, number));
+    }
+
+    public void removeItem(Integer index) {
+        this.items.remove(index);
+    }
+
 
     public void setRespawn(Location Respawn) {
         this.respawn = Respawn;
@@ -104,7 +128,11 @@ public class TeamUtil {
     public void lostTicket() {
         tickets--;
     }
-  
+
+    public List<ItemData> getItems() {
+        return items;
+    }
+
     public List<Player> getMember() {
         List<Player> MemberList = new ArrayList<Player>();
         Scoreboard score = Bukkit.getServer().getScoreboardManager().getMainScoreboard();

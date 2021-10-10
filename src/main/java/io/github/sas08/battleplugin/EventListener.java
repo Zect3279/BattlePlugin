@@ -32,9 +32,7 @@ public class EventListener implements Listener {
     @EventHandler
     public void makeSpec(PlayerDeathEvent event) {
         Boolean Spec = BattlePlugin.system.getSpec();
-        if (!Spec) {
-            return;
-        }
+        if (!Spec) { return; }
         Player player = event.getEntity();
         player.setGameMode(GameMode.SPECTATOR);
     }
@@ -62,9 +60,7 @@ public class EventListener implements Listener {
         // チームに参加していなかったら、人数が少ない方のチームに入れる
         // チームリス地に強制的にTPする
         boolean Now = GameController.GamePlaying;
-        if (!Now) {
-            return;
-        }
+        if (!Now) { return; }
         /*
          * 『あなたは、[チーム名] に所属しました。』
          * 『後5秒でリス地にTPします。』
